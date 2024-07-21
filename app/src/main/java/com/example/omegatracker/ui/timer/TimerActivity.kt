@@ -73,7 +73,6 @@ class TimerActivity: BaseActivity(), TimerView {
 
     override fun startTimer() {
         presenter.updateTimeForTimer(taskRun)
-        println(taskRun)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
