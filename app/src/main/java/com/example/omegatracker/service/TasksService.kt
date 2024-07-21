@@ -1,6 +1,5 @@
 package com.example.omegatracker.service
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -9,22 +8,10 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.provider.Settings
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import com.example.omegatracker.OmegaTrackerApplication
-import com.example.omegatracker.R
 import com.example.omegatracker.entity.TaskRun
-import com.example.omegatracker.utils.formatTimeDifference
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Singleton
 
 

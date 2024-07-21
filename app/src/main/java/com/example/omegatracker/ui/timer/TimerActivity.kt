@@ -1,30 +1,18 @@
 package com.example.omegatracker.ui.timer
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.example.omegatracker.OmegaTrackerApplication
-import com.example.omegatracker.R
 import com.example.omegatracker.databinding.ActivityTimerBinding
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.ui.base.BaseActivity
 import com.example.omegatracker.utils.formatTimeDifference
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 
 class TimerActivity: BaseActivity(), TimerView {
@@ -45,6 +33,7 @@ class TimerActivity: BaseActivity(), TimerView {
     private lateinit var taskRun: TaskRun
     private lateinit var pause: ImageButton
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTimerBinding.inflate(layoutInflater)
@@ -63,6 +52,7 @@ class TimerActivity: BaseActivity(), TimerView {
         pause = binding.pause
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun interaction() {
         checkUpdateTask()
         startTimer()
@@ -86,6 +76,7 @@ class TimerActivity: BaseActivity(), TimerView {
         println(taskRun)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun pauseTimer() {
         pause.setOnClickListener {
             if (taskRun.isRunning == true) {
@@ -101,6 +92,7 @@ class TimerActivity: BaseActivity(), TimerView {
     override fun setAnimation(newProgress: Int, maxProgress: Int) {
         progressBar.max = maxProgress
         progressBar.progress = newProgress
+        println("Progress animation = " + newProgress + "max = " + maxProgress)
     }
 
     override fun setView(taskRun: TaskRun) {

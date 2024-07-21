@@ -36,10 +36,11 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
             taskRun.requiredTime.inWholeMinutes * 60 * 1000 - taskRun.spentTime.inWholeMilliseconds
         val updateInterval = 1000L
         val maxProgress = (requiredTime / updateInterval).toInt()
-        val initialProgress = (taskRun.spentTime.inWholeMilliseconds / updateInterval).toInt()
+        var initialProgress = (taskRun.spentTime.inWholeMilliseconds / updateInterval).toInt()
 
        launch {
             while (taskRun.isRunning == true && initialProgress <= maxProgress) {
+                initialProgress++
                 viewState.setAnimation(initialProgress, maxProgress)
                 delay(updateInterval)
             }
