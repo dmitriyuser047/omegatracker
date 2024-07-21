@@ -92,7 +92,6 @@ class TimerActivity: BaseActivity(), TimerView {
     override fun setAnimation(newProgress: Int, maxProgress: Int) {
         progressBar.max = maxProgress
         progressBar.progress = newProgress
-        println("Progress animation = " + newProgress + "max = " + maxProgress)
     }
 
     override fun setView(taskRun: TaskRun) {
