@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="error_user">Неправильно введен токен</string>
+    <string name="clear"></string>
+    <string name="state_network">Проверьте соединение с интернетом</string>
+    <string name="empty_token">Вам нужно ввести свой токен</string>
+    <string name="instruction">
+        \n
+        1. Регистрируемся в YouTrack\n\n
+        2. Заходим в свой профиль\n\n
+        3. Находим пункт "Безопасность аккаунта"\n\n
+        4. Листаем вниз и находим "Токены"\n\n
+        5. Нажимаем на кнопку "новый токен"\n\n
+        6. Выбираем имя и область доступа\n\n
+        7. Копируем и сохраняем в каком-нибудь файле\n\n
+        8. Вставляем в логин и нажимаем "Войти"\n\n
+    </string>
+    <string name="in_progress">В обработке</string>
+    <string name="open">Открыта</string>
+    <string name="fixed">Исправлена</string>
+    <string name="pause">В паузе</string>
+    <string name="stopped">Завершена</string>
+    <string name="notification_content_text">Задача в работе</string>
+</resources>
