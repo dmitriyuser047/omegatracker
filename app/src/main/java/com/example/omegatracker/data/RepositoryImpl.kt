@@ -47,20 +47,22 @@ class RepositoryImpl : Repository {
 
 
     override suspend fun convertingTasks(tasksFromJson: List<TaskFromJson>): List<TaskRun> {
+        val taskFromBase = getTasksFromDatabase().associateBy { it.id }
         return tasksFromJson.map { task ->
-            TaskRun(
-                id = task.id,
-                startTime = Duration.ZERO,
-                name = task.name,
-                description = task.description,
-                projectName = task.projectName,
-                state = task.state,
-                workedTime = task.workedTime,
-                requiredTime = task.requiredTime,
-                isRunning = task.isRunning,
-                spentTime = Duration.ZERO,
-                fullTime = task.workedTime
-            )
+            val existingTask = taskFromBase[task.id]
+                TaskRun(
+                    id = task.id,
+                    startTime = Duration.ZERO,
+                    name = task.name,
+                    description = if (task.description != existingTask?.description) task.description else existingTask?.description,
+                    projectName = if (task.projectName != existingTask?.projectName) task.projectName else existingTask?.projectName,
+                    state = task.state,
+                    workedTime = task.workedTime,
+                    requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
+                    isRunning = task.isRunning,
+                    spentTime = Duration.ZERO,
+                    fullTime = task.workedTime
+                )
         }
     }
 

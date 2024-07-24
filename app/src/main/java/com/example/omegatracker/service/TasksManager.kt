@@ -10,7 +10,11 @@ import javax.inject.Singleton
 @Singleton
 class TasksManager {
 
-    private lateinit var tasksRunner: TasksRunner
+    private var tasksRunner: TasksRunner
+
+    init {
+        tasksRunner = OmegaTrackerApplication.appComponent.tasksRunner()
+    }
 
     fun launchTaskRunner(taskRun: TaskRun) {
         tasksRunner = OmegaTrackerApplication.appComponent.tasksRunner()

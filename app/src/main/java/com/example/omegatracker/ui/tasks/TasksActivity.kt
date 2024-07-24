@@ -5,10 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.MenuItem
 import android.widget.PopupMenu
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -24,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAdapterListener {
 
     private lateinit var appComponent: AppComponent
@@ -104,7 +107,6 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
     }
 
     override fun startTaskTime(taskRun: TaskRun) {
-//        component.tasksTracking().setTask(taskRun)
         presenter.startTask(taskRun)
     }
 
