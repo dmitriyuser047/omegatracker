@@ -19,17 +19,14 @@ import com.example.omegatracker.ui.tasks.TasksActivity
 import com.example.omegatracker.utils.formatTimeDifference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Singleton
-class TasksService: Service() {
+class TasksService : Service() {
 
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationChannel: NotificationChannel
@@ -37,11 +34,10 @@ class TasksService: Service() {
     private val tasksManager = OmegaTrackerApplication.appComponent.tasksManager()
 
     inner class Controller : Binder(), IController {
-        @RequiresApi(Build.VERSION_CODES.O)
         override fun startTask(taskRun: TaskRun) {
             tasksManager.launchTaskRunner(taskRun)
             subscribeToTaskUpdates(taskRun)
-            startForegroundService(taskRun) // Запускаем foreground-сервис
+            startForegroundService(taskRun)
         }
 
         override fun getUpdatedTask(taskRun: TaskRun): Flow<TaskRun> {
@@ -53,11 +49,11 @@ class TasksService: Service() {
         }
 
         override fun handleCompletedTask(taskRun: TaskRun) {
-
+            // Implementation for handling completed task
         }
 
         override fun serviceDisconnect() {
-
+            // Implementation for handling service disconnect
         }
     }
 
@@ -65,73 +61,67 @@ class TasksService: Service() {
         return Controller()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return START_STICKY
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        notificationChannel = NotificationChannel(CHANNEL_ID, NAME_CHANNEL, importance)
+        notificationChannel = NotificationChannel(CHANNEL_ID, NAME_CHANNEL, importance).apply {
+            description = "Channel for TasksService"
+        }
         notificationManager.createNotificationChannel(notificationChannel)
     }
 
-    private fun createNotification(task: TaskRun, isForeground: Boolean): Notification {
-        val intent = Intent(applicationContext, TasksActivity::class.java).apply {
+    private fun createNotificationIntent(task: TaskRun): PendingIntent {
+        return Intent(applicationContext, TasksActivity::class.java).apply {
             putExtra("taskId", task.id)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }.let { intent ->
+            PendingIntent.getActivity(
+                applicationContext,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
         }
+    }
 
-        val pendingIntent = PendingIntent.getActivity(
-            applicationContext,
-            0, // requestCode
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notificationBuilder = NotificationCompat.Builder(this, notificationChannel.id)
+    private fun createNotification(task: TaskRun): Notification {
+        val pendingIntent = createNotificationIntent(task)
+        return NotificationCompat.Builder(this, notificationChannel.id)
             .setContentTitle(task.name)
             .setSmallIcon(R.drawable.icon_monitor_circle)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setOngoing(isForeground)
             .setSound(null)
             .setVibrate(null)
-            .setOnlyAlertOnce(true)
-
-        if (isForeground) {
-            notificationBuilder.setContentText("Task is running")
-        } else {
-            val notificationContentText = formatTimeDifference(task.requiredTime, task.fullTime)
-            notificationBuilder.setContentText(notificationContentText)
-        }
-
-        return notificationBuilder.build()
-    }
-    private fun startForegroundService(taskRun: TaskRun) {
-        val notification = createNotification(taskRun, isForeground = true)
-        startForeground(taskRun.id.hashCode(), notification)
+            .apply {
+                    setContentText(formatTimeDifference(task.requiredTime, task.fullTime))
+            }
+            .build()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun showNotification(task: TaskRun) {
-        val notification = createNotification(task, isForeground = false)
+    private fun updateNotification(task: TaskRun) {
+        val notification = createNotification(task)
         notificationManager.notify(task.id.hashCode(), notification)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    private fun startForegroundService(taskRun: TaskRun) {
+        val notification = createNotification(taskRun)
+        startForeground(taskRun.id.hashCode(), notification)
+    }
+
     private fun subscribeToTaskUpdates(taskRun: TaskRun) {
         CoroutineScope(Dispatchers.Default).launch {
             tasksManager.getTaskUpdates(taskRun.id).collect { update ->
-                    showNotification(update)
+                updateNotification(taskRun)
             }
         }
     }

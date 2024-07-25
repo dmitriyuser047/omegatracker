@@ -50,6 +50,7 @@ class RepositoryImpl : Repository {
         val taskFromBase = getTasksFromDatabase().associateBy { it.id }
         return tasksFromJson.map { task ->
             val existingTask = taskFromBase[task.id]
+            println(existingTask)
                 TaskRun(
                     id = task.id,
                     startTime = Duration.ZERO,
@@ -59,7 +60,7 @@ class RepositoryImpl : Repository {
                     state = task.state,
                     workedTime = task.workedTime,
                     requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
-                    isRunning = task.isRunning,
+                    isRunning = existingTask?.isRunning,
                     spentTime = Duration.ZERO,
                     fullTime = task.workedTime
                 )
