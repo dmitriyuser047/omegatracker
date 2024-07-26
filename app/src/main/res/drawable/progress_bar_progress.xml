@@ -22,7 +22,7 @@
                 android:shape="ring"
                 android:innerRadiusRatio="3"
                 android:thicknessRatio="15"
-                android:useLevel="true">
+                android:useLevel="false">
                 <gradient
                     android:type="sweep"
                     android:startColor="#C177FF"

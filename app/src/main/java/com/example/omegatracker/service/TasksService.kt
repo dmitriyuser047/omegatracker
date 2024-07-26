@@ -19,9 +19,16 @@ import com.example.omegatracker.ui.tasks.TasksActivity
 import com.example.omegatracker.utils.formatTimeDifference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.debounce
+import kotlinx.coroutines.time.sample
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -30,13 +37,13 @@ class TasksService : Service() {
 
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationChannel: NotificationChannel
+    private val notifications = mutableMapOf<Int, Notification>()
 
     private val tasksManager = OmegaTrackerApplication.appComponent.tasksManager()
 
     inner class Controller : Binder(), IController {
         override fun startTask(taskRun: TaskRun) {
             tasksManager.launchTaskRunner(taskRun)
-            subscribeToTaskUpdates(taskRun)
             startForegroundService(taskRun)
         }
 
@@ -74,7 +81,8 @@ class TasksService : Service() {
     private fun createNotificationChannel() {
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         notificationChannel = NotificationChannel(CHANNEL_ID, NAME_CHANNEL, importance).apply {
-            description = "Channel for TasksService"
+            setSound(null, null)
+            enableVibration(false)
         }
         notificationManager.createNotificationChannel(notificationChannel)
     }
@@ -94,35 +102,47 @@ class TasksService : Service() {
     }
 
     private fun createNotification(task: TaskRun): Notification {
+        val existingNotification = notifications[task.id.hashCode()]
+        if (existingNotification!= null) {
+            return existingNotification
+        }
         val pendingIntent = createNotificationIntent(task)
-        return NotificationCompat.Builder(this, notificationChannel.id)
+        println(formatTimeDifference(task.requiredTime, task.fullTime))
+        val newNotification = NotificationCompat.Builder(this, notificationChannel.id)
             .setContentTitle(task.name)
+            .setContentText(formatTimeDifference(task.requiredTime, task.fullTime))
             .setSmallIcon(R.drawable.icon_monitor_circle)
             .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setSound(null)
-            .setVibrate(null)
-            .apply {
-                    setContentText(formatTimeDifference(task.requiredTime, task.fullTime))
-            }
             .build()
+
+        notifications[task.id.hashCode()] = newNotification
+        return newNotification
     }
 
     private fun updateNotification(task: TaskRun) {
-        val notification = createNotification(task)
-        notificationManager.notify(task.id.hashCode(), notification)
+//        val notification = notifications[task.id.hashCode()].let {
+////            NotificationCompat.Builder(this, notificationChannel.id)
+////                .setContentText(formatTimeDifference(task.requiredTime, task.fullTime))
+////                .build()
+//        }
+//        notificationManager.notify(task.id.hashCode(), notification)
+
     }
 
     private fun startForegroundService(taskRun: TaskRun) {
-        val notification = createNotification(taskRun)
-        startForeground(taskRun.id.hashCode(), notification)
+        val notification = notifications[taskRun.id.hashCode()]?: createNotification(taskRun)
+        subscribeToTaskUpdates(taskRun)
+        //startForeground(taskRun.id.hashCode(), notification)
     }
-
-    private fun subscribeToTaskUpdates(taskRun: TaskRun) {
-        CoroutineScope(Dispatchers.Default).launch {
-            tasksManager.getTaskUpdates(taskRun.id).collect { update ->
-                updateNotification(taskRun)
-            }
+    private fun subscribeToTaskUpdates(task: TaskRun) {
+        val delay = 3000.milliseconds
+        CoroutineScope(Dispatchers.IO).launch {
+            tasksManager.getTaskUpdates(task.id)
+                .sample(delay)
+                .collect {
+                    updateNotification(it)
+                }
         }
     }
 

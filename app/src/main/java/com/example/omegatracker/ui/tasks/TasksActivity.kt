@@ -39,16 +39,15 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         TasksPresenter(OmegaTrackerApplication.appComponent.repository())
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         appComponent = OmegaTrackerApplication.appComponent
         binding = ActivityTasksBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        startService()
         tasksList = binding.tasksList
         showIconProfile()
         showUserSettings()
-        startService()
     }
 
     override fun exitProfile() {
