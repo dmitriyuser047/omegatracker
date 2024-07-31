@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,6 +15,8 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.target.ImageViewTarget
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
 import com.example.omegatracker.databinding.ActivityTasksBinding
@@ -93,16 +96,14 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
 
     override fun showIconProfile() {
         val url = "${component.userManager().getUserUrl()}${component.userManager().getIcon()}"
-        val uri = Uri.parse(url)
-        try {
-            Glide.with(this)
-                .load(uri)
-                .fitCenter()
-                .error(R.drawable.ic_processing_icon1)
-                .into(binding.iconProfile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        Glide.with(this)
+            .load(url)
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(object : ImageViewTarget<Drawable>(binding.iconProfile) {
+                override fun setResource(resource: Drawable?) {
+                    binding.iconProfile.setImageDrawable(resource)
+                }
+            })
     }
 
     override fun startTaskTime(taskRun: TaskRun) {

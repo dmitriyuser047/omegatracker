@@ -99,7 +99,7 @@ class TasksAdapter(
         holder.nameTask.text = tasksRun[position].name
         holder.nameProjectTask.text = tasksRun[position].projectName
         holder.stateTask.text = tasksRun[position].state
-        holder.timeTask.text = formatTimeDifference(tasksRun[position].requiredTime, tasksRun[position].workedTime)
+        holder.timeTask.text = formatTimeDifference(tasksRun[position].requiredTime, tasksRun[position].fullTime)
     }
 
     private fun bindDaysViewData(holder: DaysViewHolder, position: Int) {

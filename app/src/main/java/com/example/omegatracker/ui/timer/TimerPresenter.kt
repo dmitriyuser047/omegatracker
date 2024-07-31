@@ -35,8 +35,8 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         val requiredTime =
             taskRun.requiredTime.inWholeMinutes * 60 * 1000 - taskRun.spentTime.inWholeMilliseconds
         val updateInterval = 1000L
-        val maxProgress = (requiredTime / updateInterval).toInt()
-        var initialProgress = (taskRun.spentTime.inWholeMilliseconds / updateInterval).toInt()
+        val maxProgress = (requiredTime / updateInterval.toFloat())
+        var initialProgress = (taskRun.spentTime.inWholeMilliseconds / updateInterval.toFloat())
 
        launch {
             while (taskRun.isRunning == true && initialProgress <= maxProgress) {

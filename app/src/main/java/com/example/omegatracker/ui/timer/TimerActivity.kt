@@ -12,6 +12,8 @@ import com.example.omegatracker.databinding.ActivityTimerBinding
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.ui.base.BaseActivity
 import com.example.omegatracker.utils.formatTimeDifference
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.seosh817.circularseekbar.CircularSeekBar
 import kotlinx.coroutines.launch
 
 
@@ -24,7 +26,6 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
     private lateinit var binding: ActivityTimerBinding
-    private lateinit var progressBar: ProgressBar
     private lateinit var backButton: ImageButton
     private lateinit var nameTask: TextView
     private lateinit var stateTask: TextView
@@ -32,6 +33,7 @@ class TimerActivity: BaseActivity(), TimerView {
     private lateinit var time: TextView
     private lateinit var taskRun: TaskRun
     private lateinit var pause: ImageButton
+    private lateinit var circularSeekBar: CircularSeekBar
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +45,7 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
     override fun initialization() {
-        progressBar = binding.progressbar
+        circularSeekBar = binding.circularSeekBar
         backButton = binding.back
         nameTask = binding.nameTask
         stateTask = binding.state
@@ -89,10 +91,11 @@ class TimerActivity: BaseActivity(), TimerView {
         }
     }
 
-    override fun setAnimation(newProgress: Int, maxProgress: Int) {
-        progressBar.max = maxProgress
-        progressBar.progress = newProgress
+    override fun setAnimation(newProgress: Float, maxProgress: Float) {
+        circularSeekBar.max = maxProgress
+        circularSeekBar.progress = newProgress
     }
+
 
     override fun setView(taskRun: TaskRun) {
         nameTask.text = taskRun.name

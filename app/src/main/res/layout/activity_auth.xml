@@ -47,7 +47,7 @@
             android:textColor="@color/black"
             android:layout_marginBottom="15dp"
             android:minHeight="48dp"
-            android:text="perm:cm9vdA==.NDgtMA==.WWLttS1YRYMm2bUIKt1bafdo9d3Kwr"
+            android:text="perm:YWRtaW4=.NDgtMA==.tFhoCwxfKTaTSFfOwzJyHNLpA0karQ"
             app:layout_constraintBottom_toTopOf="@+id/buttonSignIn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -60,7 +60,7 @@
             android:textColor="@color/black"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="15dp"
-            android:text="https://ulyanov047dima.youtrack.cloud"
+            android:text="https://ulyanovdmitriy047.youtrack.cloud"
             app:layout_constraintBottom_toTopOf="@+id/inputLogin"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
