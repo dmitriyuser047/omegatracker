@@ -107,6 +107,7 @@ class TimerActivity: BaseActivity(), TimerView {
         lifecycleScope.launch {
             presenter.getTimeForTimer(taskRun).collect {
                 time.text = formatTimeDifference(taskRun.requiredTime, it.fullTime)
+                println("Zadacha ${taskRun.name} - ${formatTimeDifference(taskRun.requiredTime, it.fullTime)}")
             }
         }
     }

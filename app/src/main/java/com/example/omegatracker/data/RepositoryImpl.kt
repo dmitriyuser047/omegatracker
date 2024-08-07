@@ -39,9 +39,9 @@ class RepositoryImpl : Repository {
         val tasksFromDatabase = getTasksFromDatabase()
         emit(tasksFromDatabase)
 
-        val tasksFromJson = youTrackApi.getTasks("Bearer $userToken")
-        emit(convertingTasks(tasksFromJson))
-        insertTasksToBase(tasksFromJson)
+//        val tasksFromJson = youTrackApi.getTasks("Bearer $userToken")
+//        emit(convertingTasks(tasksFromJson))
+//        insertTasksToBase(tasksFromJson)
 
     }.flowOn(Dispatchers.IO)
 
@@ -50,10 +50,10 @@ class RepositoryImpl : Repository {
         val taskFromBase = getTasksFromDatabase().associateBy { it.id }
         return tasksFromJson.map { task ->
             val existingTask = taskFromBase[task.id]
-            println(existingTask)
+            println(existingTask?.isRunning)
                 TaskRun(
                     id = task.id,
-                    startTime = Duration.ZERO,
+                    startTime = existingTask?.startTime ?: Duration.ZERO,
                     name = task.name,
                     description = if (task.description != existingTask?.description) task.description else existingTask?.description,
                     projectName = if (task.projectName != existingTask?.projectName) task.projectName else existingTask?.projectName,
@@ -61,8 +61,8 @@ class RepositoryImpl : Repository {
                     workedTime = task.workedTime,
                     requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
                     isRunning = existingTask?.isRunning,
-                    spentTime = Duration.ZERO,
-                    fullTime = task.workedTime
+                    spentTime = existingTask?.spentTime ?: Duration.ZERO,
+                    fullTime = existingTask?.fullTime ?: Duration.ZERO
                 )
         }
     }
@@ -90,7 +90,7 @@ class RepositoryImpl : Repository {
                 description = taskRun.description,
                 name = taskRun.name,
                 projectName = taskRun.projectName,
-                state = State.Open.toString(),
+                state = (taskRun.state ?: State.Open).toString(),
                 workedTimeLong = taskRun.workedTime.inWholeMinutes,
                 requiredTimeLong = taskRun.requiredTime.inWholeMinutes,
                 isRunning = taskRun.isRunning,
@@ -144,7 +144,7 @@ class RepositoryImpl : Repository {
         return tasks.map { task ->
             TaskRun(
                 id = task.id,
-                startTime = Duration.ZERO,
+                startTime = task.startTimeLong.toDuration(DurationUnit.MILLISECONDS),
                 name = task.name,
                 description = task.description,
                 projectName = task.projectName,
@@ -152,8 +152,8 @@ class RepositoryImpl : Repository {
                 workedTime = task.workedTime,
                 requiredTime = task.requiredTime,
                 isRunning = task.isRunning,
-                spentTime = task.endTimeLong.toDuration(DurationUnit.MILLISECONDS) - task.startTimeLong.toDuration(DurationUnit.MILLISECONDS),
-                fullTime = task.workedTime + (task.endTimeLong.toDuration(DurationUnit.MILLISECONDS) - task.startTimeLong.toDuration(DurationUnit.MILLISECONDS))
+                spentTime = Duration.ZERO,
+                fullTime = task.workedTime
             )
         }
     }

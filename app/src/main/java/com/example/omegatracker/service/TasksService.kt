@@ -38,8 +38,8 @@ class TasksService : Service() {
     inner class Controller : Binder(), IController {
         override fun startTask(taskRun: TaskRun) {
             tasksManager.launchTaskRunner(taskRun)
-            startForeground(taskRun)
-            taskUpdates(tasksManager.getTaskUpdates(taskRun.id))
+            //startForeground(taskRun)
+            //taskUpdates(tasksManager.getTaskUpdates(taskRun.id))
         }
 
         override fun getUpdatedTask(taskRun: TaskRun): Flow<TaskRun> {

@@ -114,7 +114,9 @@ class TasksAdapter(
     }
 
     fun updateTasksTime(taskRun: TaskRun) {
-        tasksRun = listener.updateTimeTasks(tasksRun, taskRun)
+        val index = tasksRun.indexOfFirst { it.id == taskRun.id }
+        tasksRun[index].fullTime = taskRun.fullTime
+        println(taskRun.fullTime)
         notifyDataSetChanged()
     }
 

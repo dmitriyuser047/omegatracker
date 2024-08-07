@@ -5,28 +5,31 @@ import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.entity.task.TaskFromJson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flowOf
+import okhttp3.internal.concurrent.TaskRunner
 import javax.inject.Singleton
 
 @Singleton
 class TasksManager {
 
-    private var tasksRunner: TasksRunner
-
-    init {
-        tasksRunner = OmegaTrackerApplication.appComponent.tasksRunner()
-    }
+    private val taskRunners: MutableMap<String, TasksRunner> = mutableMapOf()
 
     fun launchTaskRunner(taskRun: TaskRun) {
-        tasksRunner = OmegaTrackerApplication.appComponent.tasksRunner()
-        tasksRunner.launchTask(taskRun)
+        if (!taskRunners.containsKey(taskRun.id)) {
+            val newTasksRunner = OmegaTrackerApplication.appComponent.tasksRunner()
+            taskRunners[taskRun.id] = newTasksRunner
+            newTasksRunner.launchTask(taskRun)
+        } else {
+            taskRunners[taskRun.id]?.restartTask(taskRun)
+        }
     }
 
     fun stopUntilTimeTaskRunner(taskRun: TaskRun) {
-        tasksRunner.stopTask(taskRun)
+        taskRunners[taskRun.id]?.stopTask(taskRun)
     }
 
     fun getTaskUpdates(tasksId: String): Flow<TaskRun> {
-        return tasksRunner.taskUpdates.filter { it.id == tasksId }
+        return taskRunners[tasksId]!!.taskUpdates.filter { it.id == tasksId  }
     }
 
     fun getCompletedTask(task: TaskFromJson) {

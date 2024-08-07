@@ -19,6 +19,7 @@ class TasksRunner {
 
     fun launchTask(taskRun: TaskRun) {
         taskRun.startTime = System.currentTimeMillis().milliseconds - taskRun.spentTime
+        println(taskRun.isRunning)
         val job = CoroutineScope(Dispatchers.Default).launch {
             while (taskRun.isRunning == true) {
                 taskRun.spentTime = System.currentTimeMillis().milliseconds - taskRun.startTime
@@ -36,6 +37,12 @@ class TasksRunner {
             taskRun.spentTime = (System.currentTimeMillis().milliseconds - taskRun.startTime)
             foregroundTasks.remove(taskRun.id)
         }
+    }
+
+
+    fun restartTask(taskRun: TaskRun) {
+        stopTask(taskRun)
+        launchTask(taskRun)
     }
 
 }

@@ -9,19 +9,22 @@ import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BasePresenter
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.O)
-class TasksPresenter @Inject constructor(private val repositoryApiImpl: RepositoryImpl) : BasePresenter<TasksView>() {
+class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl) : BasePresenter<TasksView>() {
 
     private val component = OmegaTrackerApplication.appComponent
     private lateinit var taskController: TasksService.Controller
+    private val runningTasks = mutableMapOf<String, Job>()
 
     init {
+        viewState.startService()
         launch {
-            repositoryApiImpl.getTasks().collect { list ->
+            repositoryImpl.getTasks().collect { list ->
                 viewState.showTasks(list)
                 list.filter { it.isRunning == true }.forEach {
                     startTask(it)
@@ -38,7 +41,7 @@ class TasksPresenter @Inject constructor(private val repositoryApiImpl: Reposito
 
     fun intentToTimer(intent: Intent, taskRuns: List<TaskRun>) {
         launch {
-            repositoryApiImpl.updateTasksBase(taskRuns)
+            repositoryImpl.updateTasksBase(taskRuns)
         }
         viewState.intentToTimer(intent)
     }
@@ -73,12 +76,19 @@ class TasksPresenter @Inject constructor(private val repositoryApiImpl: Reposito
     }
 
     fun startTask(taskRun: TaskRun) {
+        launch {
+            repositoryImpl.updateTask(taskRun)
+        }
         taskController.startTask(taskRun)
-        viewState.setNewTasksTime(taskRun)
+        getUpdateTasksTime(taskRun)
     }
 
-    fun getUpdateTasksTime(taskRun: TaskRun): Flow<TaskRun> {
-        return taskController.getUpdatedTask(taskRun)
+    private fun getUpdateTasksTime(taskRun: TaskRun) {
+        runningTasks[taskRun.id] = launch {
+            taskController.getUpdatedTask(taskRun).collect {
+                viewState.setNewTasksTime(taskRun)
+            }
+        }
     }
 
 }
