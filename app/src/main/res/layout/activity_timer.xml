@@ -111,17 +111,11 @@
         app:layout_constraintEnd_toEndOf="@+id/complete"
         app:layout_constraintStart_toStartOf="@+id/complete" />
 
-    <com.seosh817.circularseekbar.CircularSeekBar
-        android:id="@+id/circular_seek_bar"
+    <com.example.omegatracker.ui.timer.TimerProgressBar
+        android:id="@+id/customProgressBar"
         android:layout_width="240dp"
         android:layout_height="240dp"
-        app:circularSeekBar_animation="normal"
-        app:circularSeekBar_barWidth="14dp"
-        app:circularSeekBar_min="0"
-        app:circularSeekBar_trackColor="@color/backround_circular"
-        app:circularSeekBar_progressGradientColors="@array/rainbow"
-        app:circularSeekBar_startAngle="180"
-        app:circularSeekBar_sweepAngle="360"
+        android:layout_gravity="center"
         app:layout_constraintBottom_toTopOf="@+id/pause"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

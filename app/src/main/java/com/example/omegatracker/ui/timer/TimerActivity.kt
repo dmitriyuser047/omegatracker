@@ -33,7 +33,7 @@ class TimerActivity: BaseActivity(), TimerView {
     private lateinit var time: TextView
     private lateinit var taskRun: TaskRun
     private lateinit var pause: ImageButton
-    private lateinit var circularSeekBar: CircularSeekBar
+    private lateinit var progressBar: TimerProgressBar
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +45,7 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
     override fun initialization() {
-        circularSeekBar = binding.circularSeekBar
+        progressBar = binding.customProgressBar
         backButton = binding.back
         nameTask = binding.nameTask
         stateTask = binding.state
@@ -92,8 +92,8 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
     override fun setAnimation(newProgress: Float, maxProgress: Float) {
-        circularSeekBar.max = maxProgress
-        circularSeekBar.progress = newProgress
+        progressBar.setMaxProgress(maxProgress)
+        progressBar.setProgress(newProgress)
     }
 
 
