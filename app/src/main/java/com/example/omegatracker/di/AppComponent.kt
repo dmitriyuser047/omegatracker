@@ -17,12 +17,10 @@ import javax.inject.Singleton
 interface AppComponent {
     fun context(): Context
     fun repository(): RepositoryImpl
-    fun sharedPreferences(): SharedPreferences
     fun authFragment(): AuthInstruction
     fun retrofitComponentBuilder(): RetrofitComponent.Builder
     fun userManager(): UserManager
-    fun tasksTracking(): TasksTracking
-    fun tasksRunner(): TasksRunner
     fun tasksManager(): TasksManager
     fun tasksService(): TasksService
+    fun tasksRunner(): TasksRunner
 }

@@ -52,10 +52,12 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         viewState.setTimer(taskRun)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getTimeForTimer(taskRun: TaskRun): Flow<TaskRun> {
-        return controller.getUpdatedTask(taskRun)
+        return controller.getUpdatedTask(taskRun.id)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun pauseTimer(taskRun: TaskRun) {
         launch {
             repositoryImpl.updateTask(taskRun)

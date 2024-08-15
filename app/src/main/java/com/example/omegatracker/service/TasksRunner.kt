@@ -12,25 +12,24 @@ import kotlin.time.Duration.Companion.milliseconds
 
 
 class TasksRunner {
-    private val _taskUpdates = MutableSharedFlow<TaskRun>(replay = 1)
+    private val _taskUpdates = MutableSharedFlow<TaskRun>()
     val taskUpdates: SharedFlow<TaskRun> = _taskUpdates
-
     private val foregroundTasks = mutableMapOf<String, Job>()
 
     fun launchTask(taskRun: TaskRun) {
+        taskRun.isRunning = true
         taskRun.startTime = System.currentTimeMillis().milliseconds - taskRun.spentTime
-        println(taskRun.isRunning)
         val job = CoroutineScope(Dispatchers.Default).launch {
             while (taskRun.isRunning == true) {
                 taskRun.spentTime = System.currentTimeMillis().milliseconds - taskRun.startTime
                 taskRun.fullTime = taskRun.workedTime + taskRun.spentTime
+                println("Full time in runner = " + taskRun.fullTime)
                 _taskUpdates.emit(taskRun)
                 delay(1000)
             }
         }
         foregroundTasks[taskRun.id] = job
     }
-
     fun stopTask(taskRun: TaskRun) {
         foregroundTasks[taskRun.id]?.let {
             it.cancel()
@@ -38,11 +37,4 @@ class TasksRunner {
             foregroundTasks.remove(taskRun.id)
         }
     }
-
-
-    fun restartTask(taskRun: TaskRun) {
-        stopTask(taskRun)
-        launchTask(taskRun)
-    }
-
 }

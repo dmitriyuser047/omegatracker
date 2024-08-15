@@ -39,9 +39,9 @@ class RepositoryImpl : Repository {
         val tasksFromDatabase = getTasksFromDatabase()
         emit(tasksFromDatabase)
 
-//        val tasksFromJson = youTrackApi.getTasks("Bearer $userToken")
-//        emit(convertingTasks(tasksFromJson))
-//        insertTasksToBase(tasksFromJson)
+        val tasksFromJson = youTrackApi.getTasks("Bearer $userToken")
+        emit(convertingTasks(tasksFromJson))
+        insertTasksToBase(convertingTasks(tasksFromJson))
 
     }.flowOn(Dispatchers.IO)
 
@@ -50,36 +50,35 @@ class RepositoryImpl : Repository {
         val taskFromBase = getTasksFromDatabase().associateBy { it.id }
         return tasksFromJson.map { task ->
             val existingTask = taskFromBase[task.id]
-            println(existingTask?.isRunning)
-                TaskRun(
-                    id = task.id,
-                    startTime = existingTask?.startTime ?: Duration.ZERO,
-                    name = task.name,
-                    description = if (task.description != existingTask?.description) task.description else existingTask?.description,
-                    projectName = if (task.projectName != existingTask?.projectName) task.projectName else existingTask?.projectName,
-                    state = task.state,
-                    workedTime = task.workedTime,
-                    requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
-                    isRunning = existingTask?.isRunning,
-                    spentTime = existingTask?.spentTime ?: Duration.ZERO,
-                    fullTime = existingTask?.fullTime ?: Duration.ZERO
-                )
+            TaskRun(
+                id = task.id,
+                startTime = Duration.ZERO,
+                name = task.name,
+                description = if (task.description != existingTask?.description) task.description else existingTask?.description,
+                projectName = if (task.projectName != existingTask?.projectName) task.projectName else existingTask?.projectName,
+                state = existingTask?.state ?: task.state,
+                workedTime = existingTask?.workedTime ?: task.workedTime,
+                requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
+                isRunning = existingTask?.isRunning ?: false,
+                spentTime = existingTask?.spentTime ?: Duration.ZERO,
+                fullTime = existingTask?.fullTime ?: task.workedTime
+            )
         }
     }
 
-    override suspend fun convertingTask(tasksFromJson: TaskFromJson): TaskRun {
+    override suspend fun convertingTask(tasksFromJson: TaskFromJson, taskRun: TaskRun): TaskRun {
         return TaskRun(
                 id = tasksFromJson.id,
-                startTime = Duration.ZERO,
+                startTime = taskRun.startTime,
                 name = tasksFromJson.name,
                 description = tasksFromJson.description,
                 projectName = tasksFromJson.projectName,
                 state = tasksFromJson.state,
                 workedTime = tasksFromJson.workedTime,
                 requiredTime = tasksFromJson.requiredTime,
-                isRunning = tasksFromJson.isRunning,
-                spentTime =  Duration.ZERO,
-                fullTime = tasksFromJson.workedTime
+                isRunning = taskRun.isRunning,
+                spentTime =  taskRun.spentTime,
+                fullTime = taskRun.fullTime
         )
     }
 
@@ -101,20 +100,20 @@ class RepositoryImpl : Repository {
     }
 
 
-    override suspend fun insertTasksToBase(tasksFromJson: List<TaskFromJson>) {
-        tasksFromJson.forEach { taskFromJson ->
+    override suspend fun insertTasksToBase(tasks: List<TaskRun>) {
+        tasks.forEach { task ->
                 taskDao.upsertTasks(
                     TaskData(
-                        id = taskFromJson.id,
-                        description = taskFromJson.description,
-                        name = taskFromJson.name,
-                        projectName = taskFromJson.projectName,
-                        state = State.Open.toString(),
-                        workedTimeLong = taskFromJson.workedTime.inWholeMinutes,
-                        requiredTimeLong = taskFromJson.requiredTime.inWholeMinutes,
-                        isRunning = taskFromJson.isRunning,
-                        startTimeLong = Duration.ZERO.toLong(DurationUnit.MINUTES),
-                        endTimeLong = Duration.ZERO.toLong(DurationUnit.MINUTES),
+                        id = task.id,
+                        description = task.description,
+                        name = task.name,
+                        projectName = task.projectName,
+                        state = task.state ?: State.Open.toString(),
+                        workedTimeLong = task.workedTime.inWholeMinutes,
+                        requiredTimeLong = task.requiredTime.inWholeMinutes,
+                        isRunning = task.isRunning,
+                        startTimeLong = task.startTime.toLong(DurationUnit.MILLISECONDS),
+                        endTimeLong = task.startTime.toLong(DurationUnit.MILLISECONDS) + task.spentTime.toLong(DurationUnit.MILLISECONDS),
                     )
                 )
         }
@@ -158,12 +157,10 @@ class RepositoryImpl : Repository {
         }
     }
 
-    override fun differenceCheckTaskRun(taskRun: TaskRun): Flow<TaskRun> {
-        return flow {
-            emit(taskRun)
-            val taskUpdated = youTrackApi.readTask(taskRun.id,"Bearer $userToken")
-            emit(convertingTask(taskUpdated))
-        }
+    override fun differenceCheckTaskRun(taskRun: TaskRun): Flow<TaskRun> = flow {
+        emit(taskRun)
+        val taskUpdated = youTrackApi.readTask(taskRun.id,"Bearer $userToken")
+        emit(convertingTask(taskUpdated, taskRun))
     }
 
 }

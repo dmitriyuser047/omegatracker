@@ -63,22 +63,21 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as TasksService.Controller
             presenter.onServiceConnected(binder)
-            println("ServiceConnected")
         }
 
         override fun onServiceDisconnected(className: ComponentName) {
             presenter.onServiceDisconnected()
-            println("ServiceDisconnected")
         }
     }
 
     override fun startService() {
         val intent = Intent(this, TasksService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)
     }
 
     override fun setNewTasksTime(taskRun: TaskRun) {
         tasksListAdapter.updateTasksTime(taskRun)
+        println("time in activity - " + taskRun.fullTime)
     }
 
 
@@ -126,8 +125,8 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         }
     }
 
-    override fun updateListTasks(list: List<TaskRun>, position: Int): List<TaskRun> {
-       return presenter.updateListTasks(list, position)
+    override fun updateListTasks(list: List<TaskRun>): List<TaskRun> {
+       return presenter.updateListTasks(list)
     }
 
     override fun updateTimeTasks(list: List<TaskRun>, taskRun: TaskRun): List<TaskRun> {
@@ -138,6 +137,10 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         intent = Intent(this, TimerActivity::class.java)
         intent.putExtra("task", taskRun)
         presenter.intentToTimer(intent,tasksRuns)
+    }
+
+    override fun startTask(taskRun: TaskRun) {
+        presenter.startTask(taskRun)
     }
 
     override fun onDialogDismiss(timeLimit: Duration) {

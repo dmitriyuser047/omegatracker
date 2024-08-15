@@ -31,16 +31,13 @@ class TimerProgressBar @JvmOverloads constructor(
     private val centerColor = Color.parseColor("#7012CE")
     private val endColor = Color.parseColor("#6600BA")
 
-    private var thickness = 30f
-    private var innerRadius = 220f / 6
+    private var thickness = 45f
     private var progress = 0f
     private var maxProgress = 100f
 
     private lateinit var sweepGradient: SweepGradient
 
     init {
-        thickness = 30f
-        innerRadius = 220f / 6
         backgroundPaint.strokeWidth = thickness
         progressPaint.strokeWidth = thickness
     }

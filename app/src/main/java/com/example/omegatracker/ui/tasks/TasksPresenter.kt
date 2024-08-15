@@ -13,26 +13,29 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl) : BasePresenter<TasksView>() {
 
     private val component = OmegaTrackerApplication.appComponent
     private lateinit var taskController: TasksService.Controller
-    private val runningTasks = mutableMapOf<String, Job>()
-
     init {
         viewState.startService()
         launch {
             repositoryImpl.getTasks().collect { list ->
-                viewState.showTasks(list)
-                list.filter { it.isRunning == true }.forEach {
-                    startTask(it)
-                }
+                restartTasks(list)
+                viewState.showTasks(updateListTasks(list))
             }
         }
     }
 
+    private fun restartTasks(list: List<TaskRun>) {
+        list.filter { it.isRunning == true }.forEach {
+            taskController.startTask(it)
+            getUpdateTasksTime(it)
+        }
+    }
 
     fun intentToAuth() {
         component.userManager().exit()
@@ -46,14 +49,9 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         viewState.intentToTimer(intent)
     }
 
-    fun updateListTasks(list: List<TaskRun>, position: Int): List<TaskRun> {
-        list[position].isRunning = true
-        val updatedList = ArrayList<TaskRun>().apply {
-            add(list[position].copy(isRunning = true))
-            addAll(list.filterIndexed { index, _ -> index != position })
-        }
-         viewState.startTaskTime(list[position])
-         return updatedList
+    fun updateListTasks(list: List<TaskRun>): List<TaskRun> {
+        val updatedList = list.sortedByDescending { it.isRunning }
+        return updatedList
     }
 
     fun updateTimeTasks(list: List<TaskRun>, taskRun: TaskRun): List<TaskRun> {
@@ -72,7 +70,6 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     }
 
     fun onServiceDisconnected() {
-        taskController.serviceDisconnect()
     }
 
     fun startTask(taskRun: TaskRun) {
@@ -84,9 +81,10 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     }
 
     private fun getUpdateTasksTime(taskRun: TaskRun) {
-        runningTasks[taskRun.id] = launch {
-            taskController.getUpdatedTask(taskRun).collect {
-                viewState.setNewTasksTime(taskRun)
+        launch {
+            taskController.getUpdatedTask(taskRun.id).collect {
+                viewState.setNewTasksTime(it)
+                println("time in presenter - " + it.fullTime)
             }
         }
     }

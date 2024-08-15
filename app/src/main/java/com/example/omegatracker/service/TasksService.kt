@@ -3,6 +3,7 @@ package com.example.omegatracker.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,8 @@ import androidx.core.app.NotificationCompat
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
 import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.ui.tasks.TasksActivity
+import com.example.omegatracker.ui.timer.TimerActivity
 import com.example.omegatracker.utils.formatTimeDifference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,31 +34,26 @@ class TasksService : Service() {
 
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationChannel: NotificationChannel
-    private val notifications = mutableMapOf<Int, Notification>()
+
+    private var notificationBuilders = mutableMapOf<Int, NotificationCompat.Builder>()
+    private var notifications = mutableMapOf<Int, Notification>()
 
     private val tasksManager = OmegaTrackerApplication.appComponent.tasksManager()
 
     inner class Controller : Binder(), IController {
         override fun startTask(taskRun: TaskRun) {
             tasksManager.launchTaskRunner(taskRun)
-            //startForeground(taskRun)
-            //taskUpdates(tasksManager.getTaskUpdates(taskRun.id))
+            createNotification(taskRun)
         }
 
-        override fun getUpdatedTask(taskRun: TaskRun): Flow<TaskRun> {
-            return tasksManager.getTaskUpdates(taskRun.id)
+        override fun getUpdatedTask(taskId: String): Flow<TaskRun> {
+            taskUpdates(tasksManager.getTaskUpdates(taskId))
+            return tasksManager.getTaskUpdates(taskId)
         }
 
         override fun stopUntilTimeTask(taskRun: TaskRun) {
             tasksManager.stopUntilTimeTaskRunner(taskRun)
-        }
-
-        override fun handleCompletedTask(taskRun: TaskRun) {
-
-        }
-
-        override fun serviceDisconnect() {
-
+            stopNotificationTask(taskRun)
         }
     }
 
@@ -84,20 +82,39 @@ class TasksService : Service() {
         }
     }
 
+    private fun createNotificationIntent(taskRun: TaskRun): PendingIntent {
+        return Intent(applicationContext, TimerActivity::class.java).apply {
+            putExtra("task", taskRun.id)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }.let { intent ->
+            PendingIntent.getActivity(
+                applicationContext,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
+    }
+
     private fun setSettingNotification(taskRun: TaskRun) {
         val notificationId = taskRun.id.hashCode()
+        val notificationIntent = createNotificationIntent(taskRun)
 
-        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Задача ${taskRun.name} ")
-            .setContentText(formatTimeDifference(taskRun.requiredTime, taskRun.fullTime))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setAutoCancel(false)
-            .setOngoing(true)
-            .setVibrate(null)
-            .setSilent(true)
+        val notificationBuilder = notificationBuilders[notificationId] ?: NotificationCompat.Builder(this, CHANNEL_ID).apply {
+            setContentTitle("Задача ${taskRun.name} ")
+            setContentText(formatTimeDifference(taskRun.requiredTime, taskRun.fullTime))
+            setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            setAutoCancel(false)
+            setOngoing(true)
+            setVibrate(null)
+            setSilent(true)
+            setContentIntent(notificationIntent)
+            setSmallIcon(R.drawable.icon_monitor_circle)
+        }
 
-        val notification = notificationBuilder.build()
-        notifications[notificationId] = notification
+        notificationBuilders[notificationId] = notificationBuilder
+        notifications[notificationId] = notificationBuilder.build()
+        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
     private fun startForeground(taskRun: TaskRun) {
@@ -105,35 +122,41 @@ class TasksService : Service() {
         val notificationId = taskRun.id.hashCode()
         startForeground(notificationId, notifications[notificationId])
     }
-
-    @OptIn(FlowPreview::class)
     fun taskUpdates(flow: Flow<TaskRun>) {
         CoroutineScope(Dispatchers.IO).launch {
-            flow.sample(5000).collect { task ->
+            flow.collect { task ->
                 updateTimeNotification(task)
             }
         }
     }
 
+    private fun createNotification(taskRun: TaskRun) {
+        setSettingNotification(taskRun)
+        startForeground(taskRun)
+    }
+
+    private fun stopNotificationTask(taskRun: TaskRun) {
+        val id = taskRun.id.hashCode()
+        notificationManager.cancel(id)
+        notificationBuilders.remove(id)
+    }
+
+    private fun stopAllNotifications() {
+        notificationManager.cancelAll()
+        notificationBuilders = mutableMapOf()
+        notifications = mutableMapOf()
+        stopForeground(STOP_FOREGROUND_DETACH)
+    }
+
     private fun updateTimeNotification(taskRun: TaskRun) {
-            val idTask = taskRun.id.hashCode()
-            val notification = notifications[idTask]
-
-            if (notification!= null) {
-                val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle("Задача ${taskRun.name} ")
-                    .setContentText(formatTimeDifference(taskRun.requiredTime, taskRun.fullTime))
-                    .setSmallIcon(R.drawable.icon_monitor_circle)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setOngoing(true)
-                    .setGroup(null)
-                    .setVibrate(null)
-                    .setSilent(true)
-
-                val newNotification = notificationBuilder.build()
-                notifications[idTask] = newNotification
-                notificationManager.notify(idTask, newNotification)
-            }
+        val notificationId = taskRun.id.hashCode()
+        val notificationBuilder = notificationBuilders[notificationId]
+        val notification = notificationBuilders[notificationId]
+        if (notification != null) {
+            val updatedText = formatTimeDifference(taskRun.requiredTime, taskRun.fullTime)
+            notificationBuilder?.setContentText(updatedText)
+            notificationManager.notify(notificationId, notificationBuilder?.build())
+        }
     }
     
 

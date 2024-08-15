@@ -99,7 +99,8 @@ class TasksAdapter(
         holder.nameTask.text = tasksRun[position].name
         holder.nameProjectTask.text = tasksRun[position].projectName
         holder.stateTask.text = tasksRun[position].state
-        holder.timeTask.text = formatTimeDifference(tasksRun[position].requiredTime, tasksRun[position].fullTime)
+        holder.timeTask.text = formatTimeDifference(tasksRun[position].requiredTime, tasksRun[position].workedTime)
+        println("Оставшиеся $position - ${tasksRun[position].name} - ${tasksRun[position].isRunning}")
     }
 
     private fun bindDaysViewData(holder: DaysViewHolder, position: Int) {
@@ -111,17 +112,18 @@ class TasksAdapter(
         holder.nameRunningTask.text = tasksRun[position].name
         val time = formatTimeDifference(tasksRun[position].requiredTime, tasksRun[position].fullTime)
         holder.timeRunningTask.text = time
+        println("Запущенные $position - ${tasksRun[position].name} - ${tasksRun[position].isRunning}")
     }
 
     fun updateTasksTime(taskRun: TaskRun) {
-        val index = tasksRun.indexOfFirst { it.id == taskRun.id }
-        tasksRun[index].fullTime = taskRun.fullTime
-        println(taskRun.fullTime)
-        notifyDataSetChanged()
+        tasksRun = listener.updateTimeTasks(tasksRun, taskRun)
+        val position = tasksRun.indexOfFirst { it.id == taskRun.id }
+        notifyItemChanged(position)
     }
 
     private fun setPlayButtonListener(position: Int, holder: AllTaskViewHolder) {
-        tasksRun = listener.updateListTasks(tasksRun, position)
+        listener.startTask(tasksRun[position])
+        tasksRun = listener.updateListTasks(tasksRun)
         tasksRun[position].state = holder.itemView.context.getString(State.InProgress.localState)
         notifyDataSetChanged()
     }

@@ -20,7 +20,6 @@ class TasksTracking : DialogFragment() {
     private lateinit var selectedMinutes: String
     private lateinit var startTask: AppCompatButton
     private var listener: TasksTrackingListener? = null
-    private lateinit var runningTask: TaskRun
     private var timeLimit: Duration = Duration.ZERO
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -57,14 +56,6 @@ class TasksTracking : DialogFragment() {
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         listener?.onDialogDismiss(timeLimit)
-    }
-
-    fun setTask(taskRun: TaskRun) {
-        runningTask = taskRun
-    }
-
-    fun getTask(): TaskRun {
-        return runningTask
     }
 
     private fun calculateTimeLimit(selectedHour: String, selectedMinutes: String): Duration {
