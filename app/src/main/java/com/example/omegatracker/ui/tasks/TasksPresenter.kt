@@ -1,7 +1,7 @@
 package com.example.omegatracker.ui.tasks
 
-import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.data.RepositoryImpl
@@ -9,19 +9,15 @@ import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BasePresenter
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl) : BasePresenter<TasksView>() {
 
     private val component = OmegaTrackerApplication.appComponent
-    private lateinit var taskController: TasksService.Controller
+    private var taskController: TasksService.Controller? = null
     init {
-        viewState.startService()
         launch {
             repositoryImpl.getTasks().collect { list ->
                 restartTasks(list)
@@ -32,21 +28,32 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
 
     private fun restartTasks(list: List<TaskRun>) {
         list.filter { it.isRunning == true }.forEach {
-            taskController.startTask(it)
+            taskController?.startTask(it)
             getUpdateTasksTime(it)
         }
     }
 
-    fun intentToAuth() {
-        component.userManager().exit()
-        viewState.showScreen(Screens.AuthScreen)
+    fun setController(binder: TasksService.Controller) {
+        taskController = binder
     }
 
-    fun intentToTimer(intent: Intent, taskRuns: List<TaskRun>) {
+    fun intentToAuth() {
+        component.userManager().exit()
+        viewState.showScreen(Screens.AuthScreen, extras = null)
+    }
+
+    fun intentToTimer(taskRuns: List<TaskRun>, extras: Bundle) {
         launch {
             repositoryImpl.updateTasksBase(taskRuns)
         }
-        viewState.intentToTimer(intent)
+        viewState.showScreen(Screens.TimerScreen, extras)
+    }
+
+    fun filterTasksByDate(filter: TaskFilterAdapter, tasksRun: List<TaskRun>): List<TaskRun> {
+        return when (filter) {
+            TaskFilterAdapter.AllTasks -> tasksRun
+            TaskFilterAdapter.Today -> tasksRun.filter { repositoryImpl.isToday(it.dataCreate) || it.isRunning == true}
+        }
     }
 
     fun updateListTasks(list: List<TaskRun>): List<TaskRun> {
@@ -64,25 +71,17 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
             list
         }
     }
-
-    fun onServiceConnected(tasksConsole: TasksService.Controller) {
-        taskController = tasksConsole
-    }
-
-    fun onServiceDisconnected() {
-    }
-
     fun startTask(taskRun: TaskRun) {
         launch {
             repositoryImpl.updateTask(taskRun)
         }
-        taskController.startTask(taskRun)
+        taskController?.startTask(taskRun)
         getUpdateTasksTime(taskRun)
     }
 
     private fun getUpdateTasksTime(taskRun: TaskRun) {
         launch {
-            taskController.getUpdatedTask(taskRun.id).collect {
+            taskController?.getUpdatedTask(taskRun.id)?.collect {
                 viewState.setNewTasksTime(it)
                 println("time in presenter - " + it.fullTime)
             }

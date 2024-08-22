@@ -5,14 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.MenuItem
 import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -24,10 +22,6 @@ import com.example.omegatracker.di.AppComponent
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.base.BaseActivity
-import com.example.omegatracker.ui.timer.TimerActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
 
@@ -54,35 +48,35 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         showUserSettings()
     }
 
+    override fun initialization() {
+        tasksList = binding.tasksList
+        showIconProfile()
+        showUserSettings()
+    }
+
     override fun exitProfile() {
         presenter.intentToAuth()
     }
 
+    override fun onStart() {
+        super.onStart()
+        val intent = Intent(this, TasksService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)
+    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as TasksService.Controller
-            presenter.onServiceConnected(binder)
+            presenter.setController(binder)
         }
 
         override fun onServiceDisconnected(className: ComponentName) {
-            presenter.onServiceDisconnected()
         }
-    }
-
-    override fun startService() {
-        val intent = Intent(this, TasksService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)
     }
 
     override fun setNewTasksTime(taskRun: TaskRun) {
         tasksListAdapter.updateTasksTime(taskRun)
         println("time in activity - " + taskRun.fullTime)
-    }
-
-
-    override fun intentToTimer(intent: Intent) {
-        startActivity(intent)
     }
 
     override fun showTasks(taskRun: List<TaskRun>) {
@@ -134,13 +128,18 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
     }
 
     override fun clickToTimer(taskRun: TaskRun, tasksRuns: List<TaskRun>) {
-        intent = Intent(this, TimerActivity::class.java)
-        intent.putExtra("task", taskRun)
-        presenter.intentToTimer(intent,tasksRuns)
+        val extras = Bundle().apply {
+            putString("task", taskRun.id)
+        }
+        presenter.intentToTimer(tasksRuns, extras)
     }
 
     override fun startTask(taskRun: TaskRun) {
         presenter.startTask(taskRun)
+    }
+
+    override fun filterTasksByDate(filter: TaskFilterAdapter, tasksRun: List<TaskRun>): List<TaskRun> {
+       return presenter.filterTasksByDate(filter, tasksRun)
     }
 
     override fun onDialogDismiss(timeLimit: Duration) {

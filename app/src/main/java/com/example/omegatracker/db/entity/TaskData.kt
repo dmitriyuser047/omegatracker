@@ -28,7 +28,8 @@ data class TaskData(
     @ColumnInfo("startTime")
     var startTimeLong: Long,
     @ColumnInfo("fullTime")
-    var endTimeLong: Long
+    var endTimeLong: Long,
+    override var dataCreate: Long
 ): Task {
     override val workedTime: Duration
         get() = workedTimeLong.toDuration(DurationUnit.MINUTES)

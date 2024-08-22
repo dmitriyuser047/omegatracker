@@ -15,4 +15,6 @@ interface Repository {
     fun differenceCheckTaskRun(taskRun: TaskRun): Flow<TaskRun>
     suspend fun convertingTask(tasksFromJson: TaskFromJson, taskRun: TaskRun): TaskRun
     suspend fun updateTask(taskRun: TaskRun)
+    suspend fun getTaskById(taskId: String): TaskRun?
+    fun isToday(timestamp: Long): Boolean
 }

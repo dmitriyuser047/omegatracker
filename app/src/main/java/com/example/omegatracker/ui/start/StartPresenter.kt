@@ -9,9 +9,9 @@ class StartPresenter : BasePresenter<StartView>() {
     private val clientUrl = component.userManager().getUserUrl()
     init {
         if (component.userManager().getUser() == null) {
-            viewState.showScreen(Screens.AuthScreen)
+            viewState.showScreen(Screens.AuthScreen, extras = null)
         } else {
-            viewState.showScreen(Screens.TasksScreen)
+            viewState.showScreen(Screens.TasksScreen, extras = null)
         }
     }
 }

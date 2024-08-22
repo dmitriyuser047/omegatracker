@@ -1,5 +1,7 @@
 package com.example.omegatracker.data
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.db.entity.TaskData
 import com.example.omegatracker.entity.State
@@ -10,6 +12,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -61,7 +69,8 @@ class RepositoryImpl : Repository {
                 requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
                 isRunning = existingTask?.isRunning ?: false,
                 spentTime = existingTask?.spentTime ?: Duration.ZERO,
-                fullTime = existingTask?.fullTime ?: task.workedTime
+                fullTime = existingTask?.fullTime ?: task.workedTime,
+                dataCreate = existingTask?.dataCreate ?: task.dataCreate
             )
         }
     }
@@ -78,7 +87,8 @@ class RepositoryImpl : Repository {
                 requiredTime = tasksFromJson.requiredTime,
                 isRunning = taskRun.isRunning,
                 spentTime =  taskRun.spentTime,
-                fullTime = taskRun.fullTime
+                fullTime = taskRun.fullTime,
+                dataCreate = tasksFromJson.dataCreate
         )
     }
 
@@ -94,9 +104,39 @@ class RepositoryImpl : Repository {
                 requiredTimeLong = taskRun.requiredTime.inWholeMinutes,
                 isRunning = taskRun.isRunning,
                 startTimeLong = taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
-                endTimeLong = (taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS)
+                endTimeLong = (taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
+                dataCreate = taskRun.dataCreate
             )
         )
+    }
+
+    override suspend fun getTaskById(taskId: String): TaskRun? {
+        val foundTask = taskDao.findTaskById(taskId)?: return null
+        return TaskRun(
+                id = foundTask.id,
+                startTime = foundTask.startTimeLong.toDuration(DurationUnit.MILLISECONDS),
+                name = foundTask.name,
+                description = foundTask.description,
+                projectName = foundTask.projectName,
+                state = State.Open.toString(),
+                workedTime = foundTask.workedTime,
+                requiredTime = foundTask.requiredTime,
+                isRunning = foundTask.isRunning,
+                spentTime = Duration.ZERO,
+                fullTime = foundTask.workedTime,
+                dataCreate = foundTask.dataCreate
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun isToday(timestamp: Long): Boolean {
+        val instant = Instant.fromEpochMilliseconds(timestamp)
+
+        val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+
+        val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+
+        return dateTime.date == now.date
     }
 
 
@@ -114,7 +154,8 @@ class RepositoryImpl : Repository {
                         isRunning = task.isRunning,
                         startTimeLong = task.startTime.toLong(DurationUnit.MILLISECONDS),
                         endTimeLong = task.startTime.toLong(DurationUnit.MILLISECONDS) + task.spentTime.toLong(DurationUnit.MILLISECONDS),
-                    )
+                        dataCreate = task.dataCreate
+                        )
                 )
         }
     }
@@ -133,6 +174,7 @@ class RepositoryImpl : Repository {
                     isRunning = taskRun.isRunning,
                     startTimeLong = taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
                     endTimeLong = (taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
+                    dataCreate = taskRun.dataCreate
                 )
             )
         }
@@ -152,7 +194,8 @@ class RepositoryImpl : Repository {
                 requiredTime = task.requiredTime,
                 isRunning = task.isRunning,
                 spentTime = Duration.ZERO,
-                fullTime = task.workedTime
+                fullTime = task.workedTime + (task.endTimeLong.toDuration(DurationUnit.MILLISECONDS) - task.startTimeLong.toDuration(DurationUnit.MILLISECONDS)),
+                dataCreate = task.dataCreate
             )
         }
     }
@@ -162,5 +205,7 @@ class RepositoryImpl : Repository {
         val taskUpdated = youTrackApi.readTask(taskRun.id,"Bearer $userToken")
         emit(convertingTask(taskUpdated, taskRun))
     }
+
+
 
 }

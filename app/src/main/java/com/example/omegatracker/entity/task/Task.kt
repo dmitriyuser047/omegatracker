@@ -9,4 +9,5 @@ interface Task {
     val workedTime: Duration
     val requiredTime: Duration
     var isRunning: Boolean?
+    var dataCreate: Long
 }

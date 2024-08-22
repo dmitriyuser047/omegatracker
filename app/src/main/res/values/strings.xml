@@ -21,4 +21,8 @@
     <string name="pause">В паузе</string>
     <string name="stopped">Завершена</string>
     <string name="notification_content_text">Задача в работе</string>
+    <string name="look_all">Смотреть все</string>
+    <string name="today">Сегодня</string>
+    <string name="all_tasks">Все задачи</string>
+    <string name="view_today_tasks">На сегодня</string>
 </resources>

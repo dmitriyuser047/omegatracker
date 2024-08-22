@@ -10,7 +10,6 @@ interface TimerView: BaseView {
     fun checkUpdateTask()
     fun setView(taskRun: TaskRun)
     fun setTimer(taskRun: TaskRun)
-    fun startTimer()
     fun pauseTimer()
     fun setAnimation(newProgress: Float, maxProgress: Float)
 }

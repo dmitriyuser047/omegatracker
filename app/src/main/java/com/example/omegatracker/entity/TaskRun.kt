@@ -15,5 +15,6 @@ data class TaskRun(
     override var isRunning: Boolean?,
     override val name: String,
     var spentTime: Duration,
-    var fullTime: Duration
+    var fullTime: Duration,
+    override var dataCreate: Long
 ): Task, Serializable

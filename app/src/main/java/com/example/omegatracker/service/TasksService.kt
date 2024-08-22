@@ -33,7 +33,6 @@ import kotlin.time.Duration.Companion.milliseconds
 class TasksService : Service() {
 
     private lateinit var notificationManager: NotificationManager
-    private lateinit var notificationChannel: NotificationChannel
 
     private var notificationBuilders = mutableMapOf<Int, NotificationCompat.Builder>()
     private var notifications = mutableMapOf<Int, Notification>()
@@ -53,7 +52,7 @@ class TasksService : Service() {
 
         override fun stopUntilTimeTask(taskRun: TaskRun) {
             tasksManager.stopUntilTimeTaskRunner(taskRun)
-            stopNotificationTask(taskRun)
+//            stopNotificationTask(taskRun)
         }
     }
 
@@ -61,9 +60,15 @@ class TasksService : Service() {
         return Controller()
     }
 
+
     override fun onCreate() {
         super.onCreate()
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -72,23 +77,28 @@ class TasksService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationChannel = NotificationChannel(
+            val channel = NotificationChannel(
                 CHANNEL_ID,
                 NAME_CHANNEL,
                 NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(notificationChannel)
+            ).apply {
+                vibrationPattern = LongArray(0) { 0 }
+                enableVibration(true)
+                enableLights(false)
+                setSound(null, null)
+            }
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
     private fun createNotificationIntent(taskRun: TaskRun): PendingIntent {
-        return Intent(applicationContext, TimerActivity::class.java).apply {
+        val context = OmegaTrackerApplication.appComponent.context()
+        return Intent(OmegaTrackerApplication.appComponent.context(), TimerActivity::class.java).apply {
             putExtra("task", taskRun.id)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let { intent ->
             PendingIntent.getActivity(
-                applicationContext,
+                context,
                 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -100,7 +110,7 @@ class TasksService : Service() {
         val notificationId = taskRun.id.hashCode()
         val notificationIntent = createNotificationIntent(taskRun)
 
-        val notificationBuilder = notificationBuilders[notificationId] ?: NotificationCompat.Builder(this, CHANNEL_ID).apply {
+        val notificationBuilder = notificationBuilders[notificationId] ?: NotificationCompat.Builder(OmegaTrackerApplication.appComponent.context(), CHANNEL_ID).apply {
             setContentTitle("Задача ${taskRun.name} ")
             setContentText(formatTimeDifference(taskRun.requiredTime, taskRun.fullTime))
             setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -118,7 +128,6 @@ class TasksService : Service() {
     }
 
     private fun startForeground(taskRun: TaskRun) {
-        setSettingNotification(taskRun)
         val notificationId = taskRun.id.hashCode()
         startForeground(notificationId, notifications[notificationId])
     }
@@ -137,7 +146,6 @@ class TasksService : Service() {
 
     private fun stopNotificationTask(taskRun: TaskRun) {
         val id = taskRun.id.hashCode()
-        notificationManager.cancel(id)
         notificationBuilders.remove(id)
     }
 

@@ -15,8 +15,7 @@ class AuthPresenter @Inject constructor(private val repositoryImpl: RepositoryIm
             try {
                 val result = repositoryImpl.getUser(token, url)
                 component.userManager().setUser(token, result.id, result.avatarUrl, url)
-                println(result.avatarUrl)
-                viewState.showScreen(Screens.TasksScreen)
+                viewState.showScreen(Screens.TasksScreen, extras = null)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

@@ -7,4 +7,5 @@ interface TasksAdapterListener {
     fun updateTimeTasks(list: List<TaskRun>, taskRun: TaskRun): List<TaskRun>
     fun clickToTimer(taskRun: TaskRun, list: List<TaskRun>)
     fun startTask(taskRun: TaskRun)
+    fun filterTasksByDate(filter: TaskFilterAdapter, tasksRun: List<TaskRun>): List<TaskRun>
 }

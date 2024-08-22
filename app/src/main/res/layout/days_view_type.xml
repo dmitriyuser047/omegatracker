@@ -3,26 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="10dp">
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/today"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/rubik_medium"
-        android:text="Сегодня"
+        android:text="@string/all_tasks"
         android:layout_marginLeft="20dp"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/look_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAllCaps="false"
         android:layout_marginRight="20dp"
         android:fontFamily="@font/rubik"
-        android:text="Смотреть всё"
+        android:text="@string/view_today_tasks"
+        android:textColor="@color/black"
+        android:background="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/today"
         app:layout_constraintEnd_toEndOf="parent"

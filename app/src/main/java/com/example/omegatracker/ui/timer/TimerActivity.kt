@@ -1,19 +1,22 @@
 package com.example.omegatracker.ui.timer
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.databinding.ActivityTimerBinding
 import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.base.BaseActivity
 import com.example.omegatracker.utils.formatTimeDifference
-import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.seosh817.circularseekbar.CircularSeekBar
 import kotlinx.coroutines.launch
 
 
@@ -31,7 +34,7 @@ class TimerActivity: BaseActivity(), TimerView {
     private lateinit var stateTask: TextView
     private lateinit var descriptionTask: TextView
     private lateinit var time: TextView
-    private lateinit var taskRun: TaskRun
+    private lateinit var taskRunner: TaskRun
     private lateinit var pause: ImageButton
     private lateinit var progressBar: TimerProgressBar
 
@@ -42,6 +45,22 @@ class TimerActivity: BaseActivity(), TimerView {
         setContentView(binding.root)
         initialization()
         interaction()
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as TasksService.Controller
+            presenter.setController(binder)
+        }
+
+        override fun onServiceDisconnected(className: ComponentName) {
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val intent = Intent(this, TasksService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)
     }
 
     override fun initialization() {
@@ -57,7 +76,6 @@ class TimerActivity: BaseActivity(), TimerView {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun interaction() {
         checkUpdateTask()
-        startTimer()
         backToTasks()
         pauseTimer()
     }
@@ -68,25 +86,20 @@ class TimerActivity: BaseActivity(), TimerView {
         }
     }
 
+
     override fun checkUpdateTask() {
-        taskRun = intent.getSerializableExtra("task") as TaskRun
-        presenter.checkUpdateProperties(taskRun)
+        val taskId = intent.getStringExtra("task")
+        if (taskId != null) {
+            presenter.findTaskRun(taskId)
+        }
     }
-
-    override fun startTimer() {
-        presenter.updateTimeForTimer(taskRun)
-        println(taskRun)
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun pauseTimer() {
         pause.setOnClickListener {
-            if (taskRun.isRunning == true) {
-                taskRun.isRunning = false
-                presenter.pauseTimer(taskRun)
+            if (taskRunner.isRunning == true) {
+                presenter.pauseTimer(taskRunner)
             } else {
-                taskRun.isRunning = true
-                presenter.resumeTimer(taskRun)
+                presenter.resumeTimer(taskRunner)
             }
         }
     }
@@ -98,14 +111,17 @@ class TimerActivity: BaseActivity(), TimerView {
 
 
     override fun setView(taskRun: TaskRun) {
+        taskRunner = taskRun
         nameTask.text = taskRun.name
         stateTask.text = taskRun.state
         descriptionTask.text = taskRun.description
+        presenter.updateTimeForTimer(taskRun)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun setTimer(taskRun: TaskRun) {
         lifecycleScope.launch {
-            presenter.getTimeForTimer(taskRun).collect {
+            presenter.getTimeForTimer(taskRun)?.collect {
                 time.text = formatTimeDifference(taskRun.requiredTime, it.fullTime)
                 println("Zadacha ${taskRun.name} - ${formatTimeDifference(taskRun.requiredTime, it.fullTime)}")
             }

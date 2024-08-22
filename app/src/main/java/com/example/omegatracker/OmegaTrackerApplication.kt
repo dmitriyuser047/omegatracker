@@ -9,6 +9,7 @@ import com.example.omegatracker.di.DaggerAppComponent
 import com.example.omegatracker.di.RetrofitComponent
 import com.example.omegatracker.di.ServiceModule
 import com.example.omegatracker.di.YouTrackModule
+import com.example.omegatracker.service.TasksService
 
 
 open class OmegaTrackerApplication : Application() {
