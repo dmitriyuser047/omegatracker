@@ -61,7 +61,8 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
     override fun onStart() {
         super.onStart()
         val intent = Intent(this, TasksService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)
+        bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
+        startService(intent)
     }
 
     private val serviceConnection = object : ServiceConnection {

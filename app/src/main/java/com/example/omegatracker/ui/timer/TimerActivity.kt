@@ -62,6 +62,7 @@ class TimerActivity: BaseActivity(), TimerView {
         super.onStart()
         val intent = Intent(this, TasksService::class.java)
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE or Context.BIND_IMPORTANT)
+        startService(intent)
     }
 
     override fun initialization() {

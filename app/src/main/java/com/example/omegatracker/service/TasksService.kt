@@ -14,7 +14,9 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
+import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.tasks.TasksActivity
 import com.example.omegatracker.ui.timer.TimerActivity
 import com.example.omegatracker.utils.formatTimeDifference
@@ -60,7 +62,6 @@ class TasksService : Service() {
         return Controller()
     }
 
-
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -88,13 +89,14 @@ class TasksService : Service() {
     }
 
     private fun createNotificationIntent(taskRun: TaskRun): PendingIntent {
+        val navigationData = NavigationData(Screens.TimerScreen, taskRun.id)
         return Intent(this, TimerActivity::class.java).apply {
-            putExtra("task", taskRun.id)
+            putExtra("navigation_data", navigationData)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let { intent ->
             PendingIntent.getActivity(
                 this,
-                0,
+                taskRun.id.hashCode(),
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
@@ -105,8 +107,8 @@ class TasksService : Service() {
         val notificationId = taskRun.id.hashCode()
         val notificationIntent = createNotificationIntent(taskRun)
 
-        val notificationBuilder = notificationBuilders[notificationId] ?: NotificationCompat.Builder(OmegaTrackerApplication.appComponent.context(), CHANNEL_ID).apply {
-            setContentTitle("Задача ${taskRun.name} ")
+        val notificationBuilder = notificationBuilders[notificationId] ?: NotificationCompat.Builder(this, CHANNEL_ID).apply {
+            setContentTitle("Задача ${taskRun.name}")
             setContentText(formatTimeDifference(taskRun.requiredTime, taskRun.fullTime))
             setPriority(NotificationCompat.PRIORITY_DEFAULT)
             setAutoCancel(false)
@@ -126,6 +128,7 @@ class TasksService : Service() {
         val notificationId = taskRun.id.hashCode()
         startForeground(notificationId, notifications[notificationId])
     }
+
     fun taskUpdates(flow: Flow<TaskRun>) {
         CoroutineScope(Dispatchers.IO).launch {
             flow.collect { task ->
@@ -142,26 +145,26 @@ class TasksService : Service() {
     private fun stopNotificationTask(taskRun: TaskRun) {
         val id = taskRun.id.hashCode()
         notificationBuilders.remove(id)
+        notifications.remove(id)
+        notificationManager.cancel(id)
     }
 
     private fun stopAllNotifications() {
         notificationManager.cancelAll()
-        notificationBuilders = mutableMapOf()
-        notifications = mutableMapOf()
+        notificationBuilders.clear()
+        notifications.clear()
         stopForeground(STOP_FOREGROUND_DETACH)
     }
 
     private fun updateTimeNotification(taskRun: TaskRun) {
         val notificationId = taskRun.id.hashCode()
         val notificationBuilder = notificationBuilders[notificationId]
-        val notification = notificationBuilders[notificationId]
-        if (notification != null) {
+        if (notificationBuilder != null) {
             val updatedText = formatTimeDifference(taskRun.requiredTime, taskRun.fullTime)
-            notificationBuilder?.setContentText(updatedText)
-            notificationManager.notify(notificationId, notificationBuilder?.build())
+            notificationBuilder.setContentText(updatedText)
+            notificationManager.notify(notificationId, notificationBuilder.build())
         }
     }
-    
 
     companion object {
         private const val CHANNEL_ID = "TasksServiceChannel"
