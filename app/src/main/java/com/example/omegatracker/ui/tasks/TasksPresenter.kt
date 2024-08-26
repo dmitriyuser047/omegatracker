@@ -49,10 +49,10 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         viewState.showScreen(Screens.TimerScreen, extras)
     }
 
-    fun filterTasksByDate(filter: TaskFilterAdapter, tasksRun: List<TaskRun>): List<TaskRun> {
+    fun filterTasksByDate(filter: TaskFilter, tasksRun: List<TaskRun>): List<TaskRun> {
         return when (filter) {
-            TaskFilterAdapter.AllTasks -> tasksRun
-            TaskFilterAdapter.Today -> tasksRun.filter { repositoryImpl.isToday(it.dataCreate) || it.isRunning == true}
+            TaskFilter.AllTasks -> tasksRun
+            TaskFilter.Today -> tasksRun.filter { repositoryImpl.isToday(it.dataCreate) || it.isRunning == true}
         }
     }
 

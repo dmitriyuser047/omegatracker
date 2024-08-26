@@ -138,7 +138,7 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         presenter.startTask(taskRun)
     }
 
-    override fun filterTasksByDate(filter: TaskFilterAdapter, tasksRun: List<TaskRun>): List<TaskRun> {
+    override fun filterTasksByDate(filter: TaskFilter, tasksRun: List<TaskRun>): List<TaskRun> {
        return presenter.filterTasksByDate(filter, tasksRun)
     }
 

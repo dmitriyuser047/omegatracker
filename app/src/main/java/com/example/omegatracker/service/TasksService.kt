@@ -92,13 +92,12 @@ class TasksService : Service() {
     }
 
     private fun createNotificationIntent(taskRun: TaskRun): PendingIntent {
-        val context = OmegaTrackerApplication.appComponent.context()
-        return Intent(OmegaTrackerApplication.appComponent.context(), TimerActivity::class.java).apply {
+        return Intent(this, TimerActivity::class.java).apply {
             putExtra("task", taskRun.id)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let { intent ->
             PendingIntent.getActivity(
-                context,
+                this,
                 0,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
