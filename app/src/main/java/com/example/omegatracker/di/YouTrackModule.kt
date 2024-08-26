@@ -1,6 +1,6 @@
 package com.example.omegatracker.di
 
-import com.example.omegatracker.entity.Value
+import com.example.omegatracker.entity.task.Value
 import com.example.omegatracker.utils.ObjectJsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory

@@ -52,7 +52,7 @@ class TasksService : Service() {
 
         override fun stopUntilTimeTask(taskRun: TaskRun) {
             tasksManager.stopUntilTimeTaskRunner(taskRun)
-//            stopNotificationTask(taskRun)
+            stopNotificationTask(taskRun)
         }
     }
 
@@ -65,10 +65,6 @@ class TasksService : Service() {
         super.onCreate()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

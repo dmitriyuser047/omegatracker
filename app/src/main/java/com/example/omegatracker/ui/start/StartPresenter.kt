@@ -1,6 +1,7 @@
 package com.example.omegatracker.ui.start
 
 import com.example.omegatracker.OmegaTrackerApplication
+import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BasePresenter
 
@@ -9,9 +10,9 @@ class StartPresenter : BasePresenter<StartView>() {
     private val clientUrl = component.userManager().getUserUrl()
     init {
         if (component.userManager().getUser() == null) {
-            viewState.showScreen(Screens.AuthScreen, extras = null)
+            viewState.showScreen(NavigationData(Screens.AuthScreen,null))
         } else {
-            viewState.showScreen(Screens.TasksScreen, extras = null)
+            viewState.showScreen(NavigationData(Screens.TasksScreen,null))
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.example.omegatracker.ui.base
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.auth.AuthActivity
 import com.example.omegatracker.ui.start.StartActivity
@@ -13,16 +15,25 @@ abstract class BaseActivity : OmegaActivity(), BaseView {
 
     abstract override val presenter: BasePresenter<out BaseView>
 
-    override fun showScreen(screen: Screens, extras: Bundle?) {
-        intent = when (screen) {
-            Screens.AuthScreen -> Intent(this, AuthActivity::class.java)
-            Screens.StartScreen -> Intent(this, StartActivity::class.java)
-            Screens.TasksScreen -> Intent(this, TasksActivity::class.java)
-            Screens.TimerScreen -> Intent(this, TimerActivity::class.java)
+    override fun showScreen(navigationData: NavigationData) {
+
+        val activityClass = getActivityClassForScreen(navigationData.screen)
+
+        val intent = Intent(this, activityClass).apply {
+            putExtra("navigation_data", navigationData)
         }
-        extras?.let { intent.putExtras(it) }
+
         startActivity(intent)
         finish()
+    }
+
+    private fun getActivityClassForScreen(screen: Screens): Class<out Activity> {
+        return when (screen) {
+            Screens.AuthScreen -> AuthActivity::class.java
+            Screens.StartScreen -> StartActivity::class.java
+            Screens.TasksScreen -> TasksActivity::class.java
+            Screens.TimerScreen -> TimerActivity::class.java
+        }
     }
 
 }

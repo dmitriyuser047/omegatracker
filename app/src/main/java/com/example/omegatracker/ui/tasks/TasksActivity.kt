@@ -128,10 +128,7 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
     }
 
     override fun clickToTimer(taskRun: TaskRun, tasksRuns: List<TaskRun>) {
-        val extras = Bundle().apply {
-            putString("task", taskRun.id)
-        }
-        presenter.intentToTimer(tasksRuns, extras)
+        presenter.intentToTimer(tasksRuns, taskRun.id)
     }
 
     override fun startTask(taskRun: TaskRun) {

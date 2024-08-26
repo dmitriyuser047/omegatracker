@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.data.RepositoryImpl
+import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.entity.task.Task
 import com.example.omegatracker.service.TasksService
@@ -21,7 +22,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     private var controller: TasksService.Controller? = null
 
     fun backAction() {
-        viewState.showScreen(Screens.TasksScreen, extras = null)
+        viewState.showScreen(NavigationData(Screens.TasksScreen, null))
     }
 
     fun setController(binder: TasksService.Controller) {
@@ -77,6 +78,9 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     @RequiresApi(Build.VERSION_CODES.O)
     fun resumeTimer(taskRun: TaskRun) {
         taskRun.isRunning = true
+        launch {
+            repositoryImpl.updateTask(taskRun)
+        }
         controller?.startTask(taskRun)
         viewState.setTimer(taskRun)
         viewState.setView(taskRun)

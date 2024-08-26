@@ -1,7 +1,5 @@
 package com.example.omegatracker.entity.task
 
-import com.example.omegatracker.entity.State
-import com.example.omegatracker.entity.Value
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.ZERO
 import kotlin.time.DurationUnit

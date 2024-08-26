@@ -4,6 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbManager
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -13,6 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.databinding.ActivityTimerBinding
+import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.base.BaseActivity
@@ -31,8 +34,6 @@ class TimerActivity: BaseActivity(), TimerView {
     private lateinit var binding: ActivityTimerBinding
     private lateinit var backButton: ImageButton
     private lateinit var nameTask: TextView
-    private lateinit var stateTask: TextView
-    private lateinit var descriptionTask: TextView
     private lateinit var time: TextView
     private lateinit var taskRunner: TaskRun
     private lateinit var pause: ImageButton
@@ -67,8 +68,6 @@ class TimerActivity: BaseActivity(), TimerView {
         progressBar = binding.customProgressBar
         backButton = binding.back
         nameTask = binding.nameTask
-        stateTask = binding.state
-        descriptionTask = binding.description
         time = binding.time
         pause = binding.pause
     }
@@ -88,7 +87,8 @@ class TimerActivity: BaseActivity(), TimerView {
 
 
     override fun checkUpdateTask() {
-        val taskId = intent.getStringExtra("task")
+        val navigationData = intent.getParcelableExtra<NavigationData>("navigation_data")
+        val taskId = navigationData?.info
         if (taskId != null) {
             presenter.findTaskRun(taskId)
         }
@@ -113,8 +113,6 @@ class TimerActivity: BaseActivity(), TimerView {
     override fun setView(taskRun: TaskRun) {
         taskRunner = taskRun
         nameTask.text = taskRun.name
-        stateTask.text = taskRun.state
-        descriptionTask.text = taskRun.description
         presenter.updateTimeForTimer(taskRun)
     }
 

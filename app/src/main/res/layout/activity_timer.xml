@@ -20,42 +20,13 @@
         android:id="@+id/nameTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
+        android:layout_marginTop="100dp"
         android:fontFamily="@font/rubik_medium"
         android:text=""
         android:textSize="22sp"
-        app:layout_constraintBottom_toBottomOf="@+id/state"
-        app:layout_constraintEnd_toStartOf="@+id/state"
-        app:layout_constraintStart_toEndOf="@+id/back"
-        app:layout_constraintTop_toTopOf="@+id/state" />
-
-    <TextView
-        android:id="@+id/state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/background_tag_task"
-        android:text=""
-        android:textColor="#FD5B71"
-        android:fontFamily="@font/rubik"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="20dp"
-        android:fontFamily="@font/rubik"
-        android:text=""
-        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nameTask" />
+        app:layout_constraintTop_toBottomOf="@+id/back" />
 
     <TextView
         android:id="@+id/time"
@@ -64,10 +35,10 @@
         android:fontFamily="@font/rubik_medium"
         android:text="00:00"
         android:textSize="40sp"
-        app:layout_constraintBottom_toTopOf="@+id/pause"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/description" />
+        app:layout_constraintBottom_toBottomOf="@+id/customProgressBar"
+        app:layout_constraintEnd_toEndOf="@+id/customProgressBar"
+        app:layout_constraintStart_toStartOf="@+id/customProgressBar"
+        app:layout_constraintTop_toTopOf="@+id/customProgressBar" />
 
 
     <ImageButton
@@ -75,50 +46,53 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginStart="70dp"
-        android:layout_marginBottom="60dp"
         android:background="@drawable/background_timer_pause"
         android:src="@drawable/pause_timer"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/customProgressBar" />
 
     <ImageButton
         android:id="@+id/complete"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginEnd="70dp"
-        android:layout_marginBottom="60dp"
         android:background="@drawable/background_timer_pause"
         android:src="@drawable/stop_timer"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/customProgressBar" />
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_marginTop="16dp"
         android:text="Пауза"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/pause"
-        app:layout_constraintStart_toStartOf="@+id/pause" />
+        app:layout_constraintStart_toStartOf="@+id/pause"
+        app:layout_constraintTop_toBottomOf="@+id/pause" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_marginTop="16dp"
         android:text="Завершить"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/complete"
-        app:layout_constraintStart_toStartOf="@+id/complete" />
+        app:layout_constraintStart_toStartOf="@+id/complete"
+        app:layout_constraintTop_toBottomOf="@+id/complete" />
 
     <com.example.omegatracker.ui.timer.TimerProgressBar
         android:id="@+id/customProgressBar"
         android:layout_width="240dp"
         android:layout_height="240dp"
         android:layout_gravity="center"
-        app:layout_constraintBottom_toTopOf="@+id/pause"
+        android:layout_marginTop="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/description" />
+        app:layout_constraintTop_toBottomOf="@+id/nameTask"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

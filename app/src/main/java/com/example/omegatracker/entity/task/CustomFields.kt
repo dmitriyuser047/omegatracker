@@ -1,6 +1,5 @@
 package com.example.omegatracker.entity.task
 
-import com.example.omegatracker.entity.Value
 import com.squareup.moshi.Json
 
 data class CustomFields(

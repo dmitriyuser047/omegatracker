@@ -1,4 +1,4 @@
-package com.example.omegatracker.entity
+package com.example.omegatracker.entity.task
 
 
 import com.example.omegatracker.R

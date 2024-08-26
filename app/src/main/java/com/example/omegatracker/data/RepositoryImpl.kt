@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.db.entity.TaskData
-import com.example.omegatracker.entity.State
+import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.entity.User
 import com.example.omegatracker.entity.task.TaskFromJson
@@ -16,8 +16,6 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import java.time.LocalDate
-import java.time.ZoneId
 import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
