@@ -68,10 +68,13 @@ class TasksAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is RunningTaskViewHolder -> holder.bind(tasksRun[position]) {
-                clickToTimer(position)
+            is RunningTaskViewHolder -> {
+                holder.update(tasksRun[position])
+                holder.roadToTimer.setOnClickListener {
+                    clickToTimer(position)
+                }
             }
-            is FilterViewHolder -> holder.bind {
+            is FilterViewHolder -> {
                 when (valueFilter) {
                     TaskFilter.AllTasks -> {
                         valueFilter = TaskFilter.Today
@@ -84,11 +87,20 @@ class TasksAdapter(
                         holder.today.text = holder.itemView.context.getString(R.string.today)
                     }
                 }
-                filterDate(valueFilter)
+                holder.lookAll.setOnClickListener {
+                    filterDate(valueFilter)
+                }
             }
-            is AllTaskViewHolder -> holder.bind(tasksRun[position - 1]) {
-                setPlayButtonListener(position - 1, holder)
-                setTaskState(holder, position - 1)
+            is AllTaskViewHolder -> {
+                val offsetPosition = position - 1
+                holder.update(tasksRun[offsetPosition])
+                holder.playTask.setOnClickListener {
+                    setPlayButtonListener(offsetPosition, holder)
+                }
+                setTaskState(holder, offsetPosition)
+                holder.taskArea.setOnClickListener {
+                    clickToTimer(offsetPosition)
+                }
             }
         }
     }
@@ -99,12 +111,12 @@ class TasksAdapter(
         val stateTask: TextView = itemView.findViewById(R.id.task_tag)
         val playTask: ImageButton = itemView.findViewById(R.id.play_task)
         val timeTask: TextView = itemView.findViewById(R.id.time_task)
-        fun bind(task: TaskRun, onPlayClickListener: (TaskRun) -> Unit) {
+        val taskArea: View = itemView.findViewById(R.id.task)
+        fun update(task: TaskRun) {
             nameTask.text = task.name
             nameProjectTask.text = task.projectName
             stateTask.text = task.state
             timeTask.text = formatTimeDifference(task.requiredTime, task.workedTime)
-            playTask.setOnClickListener { onPlayClickListener(task) }
         }
     }
 
@@ -112,19 +124,15 @@ class TasksAdapter(
         val nameRunningTask: TextView = itemView.findViewById(R.id.name_runningTask)
         val timeRunningTask: TextView = itemView.findViewById(R.id.time_runningTask)
         val roadToTimer: ImageButton = itemView.findViewById(R.id.to_timer)
-        fun bind(task: TaskRun, onTimerClickListener: (TaskRun) -> Unit) {
+        fun update(task: TaskRun) {
             nameRunningTask.text = task.name
             timeRunningTask.text = formatTimeDifference(task.requiredTime, task.fullTime)
-            roadToTimer.setOnClickListener { onTimerClickListener(task) }
         }
     }
 
     class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val today: TextView = itemView.findViewById(R.id.today)
         val lookAll: Button = itemView.findViewById(R.id.look_all)
-        fun bind(onLookAllClickListener: () -> Unit) {
-            lookAll.setOnClickListener { onLookAllClickListener() }
-        }
     }
     fun updateTasksTime(taskRun: TaskRun) {
         tasksRun = listener.updateTimeTasks(tasksRun, taskRun)

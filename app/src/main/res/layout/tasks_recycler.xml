@@ -4,7 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?selectableItemBackground"
+    android:focusable="true"
     android:paddingStart="10dp"
+    android:clickable="true"
+    android:id="@+id/task"
     android:paddingEnd="10dp">
 
     <ImageView

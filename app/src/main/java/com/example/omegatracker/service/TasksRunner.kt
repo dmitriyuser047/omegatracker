@@ -31,6 +31,7 @@ class TasksRunner {
         foregroundTasks[taskRun.id] = job
     }
     fun stopTask(taskRun: TaskRun) {
+        taskRun.isRunning = false
         foregroundTasks[taskRun.id]?.let {
             it.cancel()
             taskRun.spentTime = (System.currentTimeMillis().milliseconds - taskRun.startTime)

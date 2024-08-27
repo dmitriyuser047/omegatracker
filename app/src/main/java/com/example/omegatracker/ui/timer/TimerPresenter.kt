@@ -2,11 +2,10 @@ package com.example.omegatracker.ui.timer
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.data.RepositoryImpl
+import com.example.omegatracker.entity.ClicksButton
 import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
-import com.example.omegatracker.entity.task.Task
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BasePresenter
@@ -14,7 +13,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration
 
 class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl)
     : BasePresenter<TimerView>() {
@@ -29,12 +27,21 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         controller = binder
     }
 
+    private fun getCurrentStateOfTask(task: TaskRun): ClicksButton {
+        return if (task.isRunning == true) {
+            ClicksButton.PAUSE
+        } else {
+            ClicksButton.COMPLETE
+        }
+    }
+
     fun findTaskRun(taskId: String) {
         launch {
             val taskRun = repositoryImpl.getTaskById(taskId)
             if (taskRun != null) {
                 repositoryImpl.differenceCheckTaskRun(taskRun).collect { task ->
                     viewState.setView(task)
+                    viewState.updateButtonVisibility(getCurrentStateOfTask(task))
                     setProgressBarProgress(task)
                 }
             }
@@ -68,7 +75,6 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun pauseTimer(taskRun: TaskRun) {
-        taskRun.isRunning = false
         launch {
             repositoryImpl.updateTask(taskRun)
         }
@@ -77,7 +83,6 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun resumeTimer(taskRun: TaskRun) {
-        taskRun.isRunning = true
         launch {
             repositoryImpl.updateTask(taskRun)
         }
@@ -86,4 +91,5 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         viewState.setView(taskRun)
     }
 
+    fun completeTask(taskRun: TaskRun) {}
 }

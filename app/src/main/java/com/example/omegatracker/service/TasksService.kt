@@ -17,17 +17,13 @@ import com.example.omegatracker.R
 import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.ui.Screens
-import com.example.omegatracker.ui.tasks.TasksActivity
 import com.example.omegatracker.ui.timer.TimerActivity
 import com.example.omegatracker.utils.formatTimeDifference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
-import kotlin.time.Duration.Companion.milliseconds
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -53,7 +49,7 @@ class TasksService : Service() {
         }
 
         override fun stopUntilTimeTask(taskRun: TaskRun) {
-            tasksManager.stopUntilTimeTaskRunner(taskRun)
+            tasksManager.pauseTaskRunner(taskRun)
             stopNotificationTask(taskRun)
         }
     }
@@ -66,10 +62,44 @@ class TasksService : Service() {
         super.onCreate()
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
+        createNotificationGroup("TasksGroup")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "STOP_ALL_TASKS") {
+            tasksManager.pauseAllTasksRunners()
+            stopAllNotifications()
+        }
         return START_STICKY
+    }
+
+    private fun createNotificationGroup(groupId: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val groupChannel = NotificationChannel(
+                groupId,
+                "Tasks Group Channel",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            notificationManager.createNotificationChannel(groupChannel)
+        }
+    }
+
+    private fun createGroupNotification(groupId: String): Notification {
+        val stopAllIntent = Intent(this, TasksService::class.java).apply {
+            action = "STOP_ALL_TASKS"
+        }
+        val stopAllPendingIntent = PendingIntent.getService(
+            this,
+            0,
+            stopAllIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        return NotificationCompat.Builder(this, groupId)
+            .setSmallIcon(R.drawable.icon_monitor_circle)
+            .setGroup(groupId)
+            .addAction(R.drawable.stop_timer, "Stop All", stopAllPendingIntent)
+            .build()
     }
 
     private fun createNotificationChannel() {
@@ -111,12 +141,10 @@ class TasksService : Service() {
             setContentTitle("Задача ${taskRun.name}")
             setContentText(formatTimeDifference(taskRun.requiredTime, taskRun.fullTime))
             setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            setAutoCancel(false)
             setOngoing(true)
-            setVibrate(null)
-            setSilent(true)
             setContentIntent(notificationIntent)
             setSmallIcon(R.drawable.icon_monitor_circle)
+            setGroup("TasksGroup")
         }
 
         notificationBuilders[notificationId] = notificationBuilder
@@ -140,6 +168,8 @@ class TasksService : Service() {
     private fun createNotification(taskRun: TaskRun) {
         setSettingNotification(taskRun)
         startForeground(taskRun)
+        val groupId = "TasksGroup"
+        notificationManager.notify(groupId.hashCode(), createGroupNotification(groupId))
     }
 
     private fun stopNotificationTask(taskRun: TaskRun) {

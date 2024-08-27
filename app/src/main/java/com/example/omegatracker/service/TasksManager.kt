@@ -2,11 +2,7 @@ package com.example.omegatracker.service
 
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.entity.TaskRun
-import com.example.omegatracker.entity.task.Task
-import com.example.omegatracker.entity.task.TaskFromJson
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Singleton
 
@@ -23,9 +19,15 @@ class TasksManager {
         }
     }
 
-    fun stopUntilTimeTaskRunner(taskRun: TaskRun) {
+    fun pauseTaskRunner(taskRun: TaskRun) {
         tasksRunners[taskRun.id]?.stopTask(taskRun)
         tasksRunners.remove(taskRun.id)
+    }
+
+    fun pauseAllTasksRunners() {
+        tasksRunners.forEach {
+            tasksRunners.remove(it.key)
+        }
     }
 
     fun getTaskUpdates(taskId: String): Flow<TaskRun> {
