@@ -29,7 +29,7 @@
                 android:id="@+id/textTasks"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
+                android:layout_marginStart="25dp"
                 android:fontFamily="@font/rubik_medium"
                 android:text="Задачи"
                 android:textColor="#070417"

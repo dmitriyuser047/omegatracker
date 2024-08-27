@@ -9,7 +9,6 @@ import android.widget.EditText
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.DialogFragment
 import com.example.omegatracker.R
-import com.example.omegatracker.entity.TaskRun
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration

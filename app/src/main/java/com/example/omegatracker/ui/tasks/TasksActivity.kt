@@ -25,7 +25,7 @@ import com.example.omegatracker.ui.base.BaseActivity
 import kotlin.time.Duration
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAdapterListener {
 
     private lateinit var appComponent: AppComponent
@@ -43,27 +43,22 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         appComponent = OmegaTrackerApplication.appComponent
         binding = ActivityTasksBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        tasksList = binding.tasksList
-        showIconProfile()
-        showUserSettings()
+        initialization()
     }
 
     override fun initialization() {
         tasksList = binding.tasksList
         showIconProfile()
         showUserSettings()
+        val intent = Intent(this, TasksService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
+        startService(intent)
     }
 
     override fun exitProfile() {
         presenter.intentToAuth()
     }
 
-    override fun onStart() {
-        super.onStart()
-        val intent = Intent(this, TasksService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
-        startService(intent)
-    }
 
     private val serviceConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {

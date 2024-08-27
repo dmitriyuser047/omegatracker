@@ -1,7 +1,6 @@
 package com.example.omegatracker.entity
 
 import com.example.omegatracker.entity.task.Task
-import java.io.Serializable
 import kotlin.time.Duration
 
 data class TaskRun(
@@ -17,4 +16,4 @@ data class TaskRun(
     var spentTime: Duration,
     var fullTime: Duration,
     override var dataCreate: Long
-): Task, Serializable
+): Task

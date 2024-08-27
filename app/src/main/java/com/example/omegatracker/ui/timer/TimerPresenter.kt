@@ -6,6 +6,7 @@ import com.example.omegatracker.data.RepositoryImpl
 import com.example.omegatracker.entity.ClicksButton
 import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BasePresenter
@@ -29,7 +30,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
 
     private fun getCurrentStateOfTask(task: TaskRun): ClicksButton {
         return if (task.isRunning == true) {
-            ClicksButton.PAUSE
+            ClicksButton.START
         } else {
             ClicksButton.COMPLETE
         }
@@ -68,21 +69,20 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         viewState.setTimer(taskRun)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun getTimeForTimer(taskRun: TaskRun): Flow<TaskRun>? {
         return controller?.getUpdatedTask(taskRun.id)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun pauseTimer(taskRun: TaskRun) {
+        taskRun.state = State.InPause.toString()
         launch {
             repositoryImpl.updateTask(taskRun)
         }
         controller?.stopUntilTimeTask(taskRun)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun resumeTimer(taskRun: TaskRun) {
+        taskRun.state = State.InProgress.toString()
         launch {
             repositoryImpl.updateTask(taskRun)
         }

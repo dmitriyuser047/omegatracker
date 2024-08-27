@@ -2,7 +2,6 @@ package com.example.omegatracker.ui.base
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.auth.AuthActivity

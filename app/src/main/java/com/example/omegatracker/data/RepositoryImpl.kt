@@ -4,9 +4,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.db.entity.TaskData
-import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.entity.User
+import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.task.TaskFromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -62,7 +62,7 @@ class RepositoryImpl : Repository {
                 name = task.name,
                 description = if (task.description != existingTask?.description) task.description else existingTask?.description,
                 projectName = if (task.projectName != existingTask?.projectName) task.projectName else existingTask?.projectName,
-                state = existingTask?.state ?: task.state,
+                state = (if (existingTask?.isRunning == true || task.state == State.InProgress.toString()) State.InProgress else State.Open).toString(),
                 workedTime = existingTask?.workedTime ?: task.workedTime,
                 requiredTime = if (task.requiredTime != existingTask?.requiredTime) task.requiredTime else existingTask.requiredTime,
                 isRunning = existingTask?.isRunning ?: false,
@@ -80,7 +80,7 @@ class RepositoryImpl : Repository {
                 name = tasksFromJson.name,
                 description = tasksFromJson.description,
                 projectName = tasksFromJson.projectName,
-                state = tasksFromJson.state,
+                state = (if (taskRun.isRunning == true || tasksFromJson.state == State.InProgress.toString()) State.InProgress else State.Open).toString(),
                 workedTime = tasksFromJson.workedTime,
                 requiredTime = tasksFromJson.requiredTime,
                 isRunning = taskRun.isRunning,

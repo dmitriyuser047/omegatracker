@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Singleton
 class TasksService : Service() {
 

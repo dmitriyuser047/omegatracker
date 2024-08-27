@@ -7,8 +7,6 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +22,6 @@ import com.example.omegatracker.utils.formatTimeDifference
 import kotlinx.coroutines.launch
 
 
-
 class TimerActivity: BaseActivity(), TimerView {
 
     private val repositoryImpl = OmegaTrackerApplication.appComponent.repository()
@@ -37,7 +34,7 @@ class TimerActivity: BaseActivity(), TimerView {
     private lateinit var taskRunner: TaskRun
     private lateinit var progressBar: TimerProgressBar
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTimerBinding.inflate(layoutInflater)
@@ -67,7 +64,7 @@ class TimerActivity: BaseActivity(), TimerView {
         progressBar = binding.customProgressBar
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun interaction() {
         checkUpdateTask()
         backToTasks()
@@ -107,11 +104,14 @@ class TimerActivity: BaseActivity(), TimerView {
     override fun setView(taskRun: TaskRun) {
         taskRunner = taskRun
         binding.nameTask.text = taskRun.name
+        if (taskRun.isRunning == true) {
+            binding.state.text = getString(R.string.in_progress)
+        } else binding.state.text = getString(R.string.open)
         presenter.updateTimeForTimer(taskRun)
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun setTimer(taskRun: TaskRun) {
         lifecycleScope.launch {
             presenter.getTimeForTimer(taskRun)?.collect {
@@ -126,7 +126,7 @@ class TimerActivity: BaseActivity(), TimerView {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun updateButtonVisibility(currentState: ClicksButton) {
         when (currentState) {
             ClicksButton.START -> {
@@ -136,16 +136,25 @@ class TimerActivity: BaseActivity(), TimerView {
                 binding.pauseButton.isVisible = true
                 binding.pauseButton.setImageResource(R.drawable.pause_timer)
                 binding.textPause.text = getString(R.string.click_to_pause)
+                binding.textPause.isVisible = true
                 binding.completeButton.isVisible = true
 
                 binding.textComplete.isVisible = true
+
+                binding.state.text = getString(R.string.in_progress)
             }
 
             ClicksButton.PAUSE -> {
+                binding.startTask.isVisible = false
+                binding.textStart.isVisible = false
+
                 binding.pauseButton.setImageResource(R.drawable.play)
                 binding.textPause.text = getString(R.string.click_to_resume)
+
                 binding.completeButton.isVisible = true
                 binding.textComplete.isVisible = true
+
+                binding.state.text = getString(R.string.pause)
             }
 
             ClicksButton.COMPLETE -> {
@@ -157,6 +166,8 @@ class TimerActivity: BaseActivity(), TimerView {
 
                 binding.completeButton.isVisible = false
                 binding.textComplete.isVisible = false
+
+                binding.state.text = getString(R.string.stopped)
             }
         }
     }

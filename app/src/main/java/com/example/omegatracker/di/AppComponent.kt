@@ -1,14 +1,12 @@
 package com.example.omegatracker.di
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.example.omegatracker.data.RepositoryImpl
 import com.example.omegatracker.data.model.UserManager
 import com.example.omegatracker.service.TasksManager
 import com.example.omegatracker.service.TasksRunner
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.auth.AuthInstruction
-import com.example.omegatracker.ui.tasks.TasksTracking
 import dagger.Component
 import javax.inject.Singleton
 

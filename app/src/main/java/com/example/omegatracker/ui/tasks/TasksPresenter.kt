@@ -1,7 +1,6 @@
 package com.example.omegatracker.ui.tasks
 
 import android.os.Build
-import android.os.Bundle
 import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.data.RepositoryImpl
@@ -13,7 +12,7 @@ import com.example.omegatracker.ui.base.BasePresenter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl) : BasePresenter<TasksView>() {
 
     private val component = OmegaTrackerApplication.appComponent
