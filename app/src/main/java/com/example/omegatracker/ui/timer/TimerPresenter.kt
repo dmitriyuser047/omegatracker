@@ -1,9 +1,7 @@
 package com.example.omegatracker.ui.timer
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.omegatracker.data.RepositoryImpl
-import com.example.omegatracker.entity.ClicksButton
+import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.entity.task.State
@@ -28,11 +26,11 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         controller = binder
     }
 
-    private fun getCurrentStateOfTask(task: TaskRun): ClicksButton {
+    private fun getCurrentStateOfTask(task: TaskRun): TimerButtons {
         return if (task.isRunning == true) {
-            ClicksButton.START
+            TimerButtons.START
         } else {
-            ClicksButton.COMPLETE
+            TimerButtons.COMPLETE
         }
     }
 
@@ -74,7 +72,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     }
 
     fun pauseTimer(taskRun: TaskRun) {
-        taskRun.state = State.InPause.toString()
+        viewState.changeState(taskRun, State.InPause)
         launch {
             repositoryImpl.updateTask(taskRun)
         }
@@ -82,7 +80,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     }
 
     fun resumeTimer(taskRun: TaskRun) {
-        taskRun.state = State.InProgress.toString()
+        viewState.changeState(taskRun, State.InProgress)
         launch {
             repositoryImpl.updateTask(taskRun)
         }

@@ -1,6 +1,6 @@
 package com.example.omegatracker.entity
 
-enum class ClicksButton {
+enum class TimerButtons {
     START,
     PAUSE,
     COMPLETE,
