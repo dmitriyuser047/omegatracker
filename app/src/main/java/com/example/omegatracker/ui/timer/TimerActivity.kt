@@ -11,11 +11,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
 import com.example.omegatracker.databinding.ActivityTimerBinding
-import com.example.omegatracker.entity.TimerButtons
-import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.service.TasksService
+import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BaseActivity
 import com.example.omegatracker.utils.formatTimeDifference
 import kotlinx.coroutines.launch
@@ -87,8 +87,8 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
     override fun checkUpdateTask() {
-        val navigationData = intent.getParcelableExtra<NavigationData>("navigation_data")
-        val taskId = navigationData?.info
+        val receivedTaskRun = intent.getParcelableExtra<TaskRun>("taskRun")
+        val taskId = receivedTaskRun?.id
         if (taskId != null) {
             presenter.findTaskRun(taskId)
         }
@@ -106,6 +106,10 @@ class TimerActivity: BaseActivity(), TimerView {
             State.InPause -> taskRun.state = getString(State.InPause.localState)
             State.Stopped -> taskRun.state = getString(State.Stopped.localState)
         }
+    }
+
+    override fun navigateTo(screens: Screens) {
+        createIntent(this, screens)
     }
 
 

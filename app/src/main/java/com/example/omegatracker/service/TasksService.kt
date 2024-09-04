@@ -10,11 +10,9 @@ import android.content.Intent
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
-import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.timer.TimerActivity
@@ -24,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Singleton
-
 
 
 @Singleton
@@ -119,9 +116,8 @@ class TasksService : Service() {
     }
 
     private fun createNotificationIntent(taskRun: TaskRun): PendingIntent {
-        val navigationData = NavigationData(Screens.TimerScreen, taskRun.id)
         return Intent(this, TimerActivity::class.java).apply {
-            putExtra("navigation_data", navigationData)
+            putExtra("taskRun", taskRun)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }.let { intent ->
             PendingIntent.getActivity(

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.EditText
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.databinding.ActivityAuthBinding
+import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BaseActivity
 
 class AuthActivity : BaseActivity(), AuthView {
@@ -37,9 +38,12 @@ class AuthActivity : BaseActivity(), AuthView {
         appComponent.authFragment().show(supportFragmentManager, "tag")
     }
 
+    override fun navigateTo(screens: Screens) {
+        createIntent(this, screens)
+    }
+
     override fun startSignIn() {
         presenter.onSignInClicked(clientToken, clientUrl)
-        println(clientToken + clientUrl)
     }
 
 }

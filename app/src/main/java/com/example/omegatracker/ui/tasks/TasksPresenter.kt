@@ -1,10 +1,7 @@
 package com.example.omegatracker.ui.tasks
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.data.RepositoryImpl
-import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
@@ -39,14 +36,14 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
 
     fun intentToAuth() {
         component.userManager().exit()
-        viewState.showScreen(NavigationData(Screens.AuthScreen,null))
+        viewState.navigateTo(Screens.AuthScreen)
     }
 
-    fun intentToTimer(taskRuns: List<TaskRun>, taskId: String) {
+    fun intentToTimer(taskRuns: List<TaskRun>, taskRun: TaskRun) {
         launch {
             repositoryImpl.updateTasksBase(taskRuns)
         }
-        viewState.showScreen(NavigationData(Screens.TimerScreen, taskId))
+        viewState.navigateTo(Screens.TimerScreen(taskRun))
     }
 
     fun filterTasksByDate(filter: TaskFilter, tasksRun: List<TaskRun>): List<TaskRun> {

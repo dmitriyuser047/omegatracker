@@ -12,4 +12,5 @@ class AuthModule {
     fun provideAuthFragment(): AuthInstruction {
         return AuthInstruction()
     }
+
 }

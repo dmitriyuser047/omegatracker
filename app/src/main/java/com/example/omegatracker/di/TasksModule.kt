@@ -12,5 +12,4 @@ class TasksModule {
     fun provideTaskTracking(): TasksTracking {
         return TasksTracking()
     }
-
 }

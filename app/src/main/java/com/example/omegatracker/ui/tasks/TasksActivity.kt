@@ -5,12 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.MenuItem
 import android.widget.PopupMenu
-import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -21,9 +19,9 @@ import com.example.omegatracker.databinding.ActivityTasksBinding
 import com.example.omegatracker.di.AppComponent
 import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.service.TasksService
+import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BaseActivity
 import kotlin.time.Duration
-
 
 
 class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAdapterListener {
@@ -53,6 +51,10 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
         val intent = Intent(this, TasksService::class.java)
         bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
         startService(intent)
+    }
+
+    override fun navigateTo(screens: Screens) {
+        createIntent(this, screens)
     }
 
     override fun exitProfile() {
@@ -124,7 +126,7 @@ class TasksActivity : BaseActivity(), TasksView, TasksTrackingListener, TasksAda
     }
 
     override fun clickToTimer(taskRun: TaskRun, tasksRuns: List<TaskRun>) {
-        presenter.intentToTimer(tasksRuns, taskRun.id)
+        presenter.intentToTimer(tasksRuns, taskRun)
     }
 
     override fun startTask(taskRun: TaskRun) {

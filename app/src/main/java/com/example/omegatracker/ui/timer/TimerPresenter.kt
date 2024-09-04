@@ -1,9 +1,8 @@
 package com.example.omegatracker.ui.timer
 
 import com.example.omegatracker.data.RepositoryImpl
-import com.example.omegatracker.entity.TimerButtons
-import com.example.omegatracker.entity.NavigationData
 import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
@@ -19,7 +18,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     private var controller: TasksService.Controller? = null
 
     fun backAction() {
-        viewState.showScreen(NavigationData(Screens.TasksScreen, null))
+        viewState.navigateTo(Screens.TasksScreen)
     }
 
     fun setController(binder: TasksService.Controller) {
