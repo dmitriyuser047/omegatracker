@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.db.entity.TaskData
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.User
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.task.TaskFromJson
@@ -46,6 +46,7 @@ class RepositoryImpl : Repository {
         emit(tasksFromDatabase)
 
         val tasksFromJson = youTrackApi.getTasks("Bearer $userToken")
+        println(tasksFromJson)
         emit(convertingTasks(tasksFromJson))
         insertTasksToBase(convertingTasks(tasksFromJson))
 
@@ -126,7 +127,6 @@ class RepositoryImpl : Repository {
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun isToday(timestamp: Long): Boolean {
         val instant = Instant.fromEpochMilliseconds(timestamp)
 

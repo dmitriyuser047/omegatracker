@@ -1,6 +1,6 @@
 package com.example.omegatracker.service
 
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

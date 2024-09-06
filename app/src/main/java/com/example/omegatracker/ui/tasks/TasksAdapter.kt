@@ -8,7 +8,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.omegatracker.R
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.utils.formatTimeDifference
 

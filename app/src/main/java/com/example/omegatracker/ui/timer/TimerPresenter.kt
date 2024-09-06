@@ -1,7 +1,7 @@
 package com.example.omegatracker.ui.timer
 
 import com.example.omegatracker.data.RepositoryImpl
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.service.TasksService
@@ -75,7 +75,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         launch {
             repositoryImpl.updateTask(taskRun)
         }
-        controller?.stopUntilTimeTask(taskRun)
+        controller?.pauseTask(taskRun)
     }
 
     fun resumeTimer(taskRun: TaskRun) {

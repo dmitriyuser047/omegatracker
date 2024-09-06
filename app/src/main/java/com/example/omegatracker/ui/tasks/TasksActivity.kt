@@ -17,7 +17,7 @@ import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
 import com.example.omegatracker.databinding.ActivityTasksBinding
 import com.example.omegatracker.di.AppComponent
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BaseActivity

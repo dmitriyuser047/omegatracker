@@ -1,6 +1,6 @@
 package com.example.omegatracker.ui.timer
 
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.ui.base.BaseView
@@ -17,4 +17,5 @@ interface TimerView: BaseView {
     fun setAnimation(newProgress: Float, maxProgress: Float)
 
     fun changeState(taskRun: TaskRun, state: State)
+    fun buttonActions()
 }

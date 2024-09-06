@@ -29,4 +29,6 @@
     <string name="click_to_pause">Пауза</string>
     <string name="click_to_stop">Завершить</string>
     <string name="click_to_resume">Возобновить</string>
+    <string name="bottom_description_task">Описание задачи</string>
+    <string name="empty_description">У этой задачи пока нет описания.</string>
 </resources>

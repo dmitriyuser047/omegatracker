@@ -1,7 +1,7 @@
 package com.example.omegatracker.ui
 
 import android.os.Parcelable
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import kotlinx.parcelize.Parcelize
 
 sealed class Screens {

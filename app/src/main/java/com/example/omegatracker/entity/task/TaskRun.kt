@@ -1,4 +1,4 @@
-package com.example.omegatracker.entity
+package com.example.omegatracker.entity.task
 
 import android.os.Parcelable
 import com.example.omegatracker.entity.task.Task
@@ -21,4 +21,3 @@ data class TaskRun(
     var fullTime:  @RawValue Duration,
     override var dataCreate: Long
 ): Task, Parcelable
-//уточнить

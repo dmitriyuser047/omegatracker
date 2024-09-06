@@ -6,18 +6,21 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
 import com.example.omegatracker.databinding.ActivityTimerBinding
-import com.example.omegatracker.entity.TaskRun
 import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.task.State
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.BaseActivity
 import com.example.omegatracker.utils.formatTimeDifference
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import kotlinx.coroutines.launch
 
 
@@ -63,10 +66,13 @@ class TimerActivity: BaseActivity(), TimerView {
         progressBar = binding.customProgressBar
     }
 
-
     override fun interaction() {
         checkUpdateTask()
         backToTasks()
+        buttonActions()
+    }
+
+    override fun buttonActions() {
         binding.startTask.setOnClickListener {
             presenter.resumeTimer(taskRunner)
             updateButtonVisibility(TimerButtons.START)
@@ -116,9 +122,13 @@ class TimerActivity: BaseActivity(), TimerView {
     override fun setView(taskRun: TaskRun) {
         taskRunner = taskRun
         binding.nameTask.text = taskRun.name
+        println(taskRun.description)
+        binding.bottomSheetDescription.description.text = taskRun.description
+            ?: getString(R.string.empty_description)
         if (taskRun.isRunning == true) {
             binding.state.text = getString(R.string.in_progress)
         } else binding.state.text = getString(R.string.open)
+
         presenter.updateTimeForTimer(taskRun)
     }
 
@@ -128,7 +138,6 @@ class TimerActivity: BaseActivity(), TimerView {
         lifecycleScope.launch {
             presenter.getTimeForTimer(taskRun)?.collect {
                 binding.time.text = formatTimeDifference(taskRun.requiredTime, it.fullTime)
-                println("Zadacha ${taskRun.name} - ${formatTimeDifference(taskRun.requiredTime, it.fullTime)}")
             }
         }
     }
@@ -180,6 +189,17 @@ class TimerActivity: BaseActivity(), TimerView {
                 binding.textComplete.isVisible = false
 
                 binding.state.text = getString(R.string.stopped)
+            }
+
+            TimerButtons.HIDE_ALL ->  {
+                binding.startTask.isVisible = false
+                binding.textStart.isVisible = false
+
+                binding.pauseButton.isVisible = false
+                binding.textPause.isVisible = false
+
+                binding.completeButton.isVisible = false
+                binding.textComplete.isVisible = false
             }
         }
     }

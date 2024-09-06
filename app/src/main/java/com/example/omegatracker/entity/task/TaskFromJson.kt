@@ -13,7 +13,6 @@ data class TaskFromJson (
     val project:  ProjectTask,
     val customFields: List<CustomFields>,
     val created: Long
-
 ): Task {
     override val name: String = summary
     override val projectName: String? = project.shortName

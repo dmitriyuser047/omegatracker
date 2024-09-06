@@ -1,6 +1,6 @@
 package com.example.omegatracker.data
 
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.User
 import com.example.omegatracker.entity.task.TaskFromJson
 import kotlinx.coroutines.flow.Flow

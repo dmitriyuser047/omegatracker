@@ -1,6 +1,6 @@
 package com.example.omegatracker.ui.tasks
 
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 
 interface TasksAdapterListener {
     fun updateListTasks(list: List<TaskRun>): List<TaskRun>

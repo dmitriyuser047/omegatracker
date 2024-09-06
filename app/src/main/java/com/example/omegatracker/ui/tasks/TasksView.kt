@@ -1,6 +1,6 @@
 package com.example.omegatracker.ui.tasks
 
-import com.example.omegatracker.entity.TaskRun
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.ui.base.BaseView
 
 interface TasksView : BaseView {
