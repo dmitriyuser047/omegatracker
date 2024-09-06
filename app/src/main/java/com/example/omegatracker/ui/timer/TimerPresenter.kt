@@ -27,8 +27,10 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
 
     private fun getCurrentStateOfTask(task: TaskRun): TimerButtons {
         return if (task.isRunning == true) {
+            viewState.changeState(State.InProgress)
             TimerButtons.START
         } else {
+            viewState.changeState(State.Open)
             TimerButtons.COMPLETE
         }
     }
@@ -71,7 +73,6 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     }
 
     fun pauseTimer(taskRun: TaskRun) {
-        viewState.changeState(taskRun, State.InPause)
         launch {
             repositoryImpl.updateTask(taskRun)
         }
@@ -79,7 +80,6 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     }
 
     fun resumeTimer(taskRun: TaskRun) {
-        viewState.changeState(taskRun, State.InProgress)
         launch {
             repositoryImpl.updateTask(taskRun)
         }

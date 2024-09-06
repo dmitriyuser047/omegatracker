@@ -75,15 +75,18 @@ class TimerActivity: BaseActivity(), TimerView {
     override fun buttonActions() {
         binding.startTask.setOnClickListener {
             presenter.resumeTimer(taskRunner)
+            changeState(State.InProgress)
             updateButtonVisibility(TimerButtons.START)
         }
         binding.pauseButton.setOnClickListener {
             if (taskRunner.isRunning == false) {
                 presenter.resumeTimer(taskRunner)
                 updateButtonVisibility(TimerButtons.START)
+                changeState(State.InProgress)
             } else {
                 presenter.pauseTimer(taskRunner)
                 updateButtonVisibility(TimerButtons.PAUSE)
+                changeState(State.InPause)
             }
         }
         binding.completeButton.setOnClickListener {
@@ -105,12 +108,24 @@ class TimerActivity: BaseActivity(), TimerView {
         progressBar.setProgress(newProgress)
     }
 
-    override fun changeState(taskRun: TaskRun, state: State) {
+    override fun changeState(state: State) {
         when (state) {
-            State.InProgress -> taskRun.state = getString(State.InProgress.localState)
-            State.Open -> taskRun.state = getString(State.Open.localState)
-            State.InPause -> taskRun.state = getString(State.InPause.localState)
-            State.Stopped -> taskRun.state = getString(State.Stopped.localState)
+            State.InProgress -> {
+                taskRunner.state = getString(State.InProgress.localState)
+                binding.state.text = getString(State.InProgress.localState)
+            }
+            State.Open -> {
+                taskRunner.state = getString(State.Open.localState)
+                binding.state.text = getString(State.Open.localState)
+            }
+            State.InPause -> {
+                taskRunner.state = getString(State.InPause.localState)
+                binding.state.text = getString(State.InPause.localState)
+            }
+            State.Stopped -> {
+                taskRunner.state = getString(State.Stopped.localState)
+                binding.state.text = getString(State.Stopped.localState)
+            }
         }
     }
 
@@ -118,17 +133,11 @@ class TimerActivity: BaseActivity(), TimerView {
         createIntent(this, screens)
     }
 
-
     override fun setView(taskRun: TaskRun) {
         taskRunner = taskRun
         binding.nameTask.text = taskRun.name
-        println(taskRun.description)
         binding.bottomSheetDescription.description.text = taskRun.description
             ?: getString(R.string.empty_description)
-        if (taskRun.isRunning == true) {
-            binding.state.text = getString(R.string.in_progress)
-        } else binding.state.text = getString(R.string.open)
-
         presenter.updateTimeForTimer(taskRun)
     }
 
@@ -162,7 +171,6 @@ class TimerActivity: BaseActivity(), TimerView {
 
                 binding.textComplete.isVisible = true
 
-                binding.state.text = getString(R.string.in_progress)
             }
 
             TimerButtons.PAUSE -> {
@@ -175,7 +183,6 @@ class TimerActivity: BaseActivity(), TimerView {
                 binding.completeButton.isVisible = true
                 binding.textComplete.isVisible = true
 
-                binding.state.text = getString(R.string.pause)
             }
 
             TimerButtons.COMPLETE -> {
@@ -188,18 +195,6 @@ class TimerActivity: BaseActivity(), TimerView {
                 binding.completeButton.isVisible = false
                 binding.textComplete.isVisible = false
 
-                binding.state.text = getString(R.string.stopped)
-            }
-
-            TimerButtons.HIDE_ALL ->  {
-                binding.startTask.isVisible = false
-                binding.textStart.isVisible = false
-
-                binding.pauseButton.isVisible = false
-                binding.textPause.isVisible = false
-
-                binding.completeButton.isVisible = false
-                binding.textComplete.isVisible = false
             }
         }
     }

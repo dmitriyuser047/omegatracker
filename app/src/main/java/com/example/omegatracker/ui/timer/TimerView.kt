@@ -16,6 +16,6 @@ interface TimerView: BaseView {
     fun updateButtonVisibility(currentState: TimerButtons)
     fun setAnimation(newProgress: Float, maxProgress: Float)
 
-    fun changeState(taskRun: TaskRun, state: State)
+    fun changeState(state: State)
     fun buttonActions()
 }
