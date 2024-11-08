@@ -15,6 +15,7 @@ class ServiceModule {
     fun provideTaskRunner(): TasksRunner {
         return TasksRunner()
     }
+
     @Singleton
     @Provides
     fun provideTaskManager(): TasksManager {

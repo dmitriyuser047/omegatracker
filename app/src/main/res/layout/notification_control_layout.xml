@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:orientation="horizontal"
+    android:layout_marginStart="10dp"
+    android:layout_marginTop="10dp">
+
+    <Button
+        android:id="@+id/pause_all"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:backgroundTint="@color/purple_light"
+        android:background="@drawable/background_timer"
+        android:text="Pause All"
+        android:layout_marginEnd="50dp"/>
+
+
+    <Button
+        android:id="@+id/play_all"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:backgroundTint="@color/purple_light"
+        android:text="Play All"
+        android:background="@drawable/background_timer"/>
+
+</LinearLayout>

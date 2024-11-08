@@ -19,17 +19,18 @@ class TasksRunner {
     fun launchTask(taskRun: TaskRun) {
         taskRun.isRunning = true
         taskRun.startTime = System.currentTimeMillis().milliseconds - taskRun.spentTime
-        val job = CoroutineScope(Dispatchers.Default).launch {
+        val job = CoroutineScope(Dispatchers.IO).launch {
             while (taskRun.isRunning == true) {
                 taskRun.spentTime = System.currentTimeMillis().milliseconds - taskRun.startTime
                 taskRun.fullTime = taskRun.workedTime + taskRun.spentTime
-                println("Full time in runner = " + taskRun.fullTime)
+                println("TaskRun FullTime " + taskRun.fullTime)
                 _taskUpdates.emit(taskRun)
                 delay(1000)
             }
         }
         foregroundTasks[taskRun.id] = job
     }
+
     fun stopTask(taskRun: TaskRun) {
         taskRun.isRunning = false
         foregroundTasks[taskRun.id]?.let {
@@ -37,5 +38,6 @@ class TasksRunner {
             taskRun.spentTime = (System.currentTimeMillis().milliseconds - taskRun.startTime)
             foregroundTasks.remove(taskRun.id)
         }
+        println(foregroundTasks.size)
     }
 }

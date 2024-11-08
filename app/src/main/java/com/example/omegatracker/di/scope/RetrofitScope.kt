@@ -1,8 +1,8 @@
-package com.example.omegatracker.di
+package com.example.omegatracker.di.scope
 
 import javax.inject.Scope
 
 @Scope
 @Retention(AnnotationRetention.RUNTIME)
-annotation class AlternativeSingleton
+annotation class RetrofitScope
 

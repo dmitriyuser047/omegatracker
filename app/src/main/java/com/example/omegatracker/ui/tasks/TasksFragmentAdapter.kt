@@ -1,15 +1,17 @@
 package com.example.omegatracker.ui.tasks
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.omegatracker.R
-import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.task.State
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.utils.formatTimeDifference
 
 enum class TaskFilter {
@@ -18,7 +20,7 @@ enum class TaskFilter {
 }
 
 
-class TasksAdapter(
+class TasksFragmentAdapter(
     private var tasksRun: List<TaskRun>,
     private val listener: TasksAdapterListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -30,7 +32,7 @@ class TasksAdapter(
     override fun getItemCount(): Int {
         return if (todayTasksRun.isNotEmpty()) {
             todayTasksRun.size + 1
-        } else if (tasksRun.isNotEmpty()){
+        } else if (tasksRun.isNotEmpty()) {
             tasksRun.size + 1
         } else {
             0
@@ -45,6 +47,7 @@ class TasksAdapter(
             else -> ALL_TASK_VIEW_TYPE
         }
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             RUNNING_TASK_VIEW_TYPE -> {
@@ -52,16 +55,19 @@ class TasksAdapter(
                     .inflate(R.layout.running_task_recycler, parent, false)
                 RunningTaskViewHolder(itemView)
             }
+
             ALL_TASK_VIEW_TYPE -> {
                 val itemView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.tasks_recycler, parent, false)
                 AllTaskViewHolder(itemView)
             }
+
             DAYS_VIEW_TYPE -> {
                 val itemView = LayoutInflater.from(parent.context)
                     .inflate(R.layout.days_view_type, parent, false)
                 FilterViewHolder(itemView)
             }
+
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -74,13 +80,16 @@ class TasksAdapter(
                     clickToTimer(position)
                 }
             }
+
             is FilterViewHolder -> {
                 when (valueFilter) {
                     TaskFilter.AllTasks -> {
                         valueFilter = TaskFilter.Today
-                        holder.lookAll.text = holder.itemView.context.getString(R.string.view_today_tasks)
+                        holder.lookAll.text =
+                            holder.itemView.context.getString(R.string.view_today_tasks)
                         holder.today.text = holder.itemView.context.getString(R.string.all_tasks)
                     }
+
                     TaskFilter.Today -> {
                         valueFilter = TaskFilter.AllTasks
                         holder.lookAll.text = holder.itemView.context.getString(R.string.look_all)
@@ -91,6 +100,7 @@ class TasksAdapter(
                     filterDate(valueFilter)
                 }
             }
+
             is AllTaskViewHolder -> {
                 val offsetPosition = position - 1
                 holder.update(tasksRun[offsetPosition])
@@ -106,9 +116,10 @@ class TasksAdapter(
     }
 
     class AllTaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameTask: TextView = itemView.findViewById(R.id.name_task)
-        val nameProjectTask: TextView = itemView.findViewById(R.id.name_project)
+        private val nameTask: TextView = itemView.findViewById(R.id.name_task)
+        private val nameProjectTask: TextView = itemView.findViewById(R.id.name_project)
         val stateTask: TextView = itemView.findViewById(R.id.task_tag)
+        val imageTask: ImageView = itemView.findViewById(R.id.icon_task)
         val playTask: ImageButton = itemView.findViewById(R.id.play_task)
         val timeTask: TextView = itemView.findViewById(R.id.time_task)
         val taskArea: View = itemView.findViewById(R.id.task)
@@ -121,8 +132,8 @@ class TasksAdapter(
     }
 
     class RunningTaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameRunningTask: TextView = itemView.findViewById(R.id.name_runningTask)
-        val timeRunningTask: TextView = itemView.findViewById(R.id.time_runningTask)
+        private val nameRunningTask: TextView = itemView.findViewById(R.id.name_runningTask)
+        private val timeRunningTask: TextView = itemView.findViewById(R.id.time_runningTask)
         val roadToTimer: ImageButton = itemView.findViewById(R.id.to_timer)
         fun update(task: TaskRun) {
             nameRunningTask.text = task.name
@@ -133,10 +144,14 @@ class TasksAdapter(
     class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val today: TextView = itemView.findViewById(R.id.today)
         val lookAll: Button = itemView.findViewById(R.id.look_all)
+
     }
+
     fun updateTasksTime(taskRun: TaskRun) {
+        Log.d("TasksFragmentAdapter", "Updating task: ${taskRun.id} with time ${taskRun.fullTime}")
         tasksRun = listener.updateTimeTasks(tasksRun, taskRun)
         val position = tasksRun.indexOfFirst { it.id == taskRun.id }
+        println(position)
         notifyItemChanged(position)
     }
 
@@ -144,7 +159,7 @@ class TasksAdapter(
         listener.startTask(tasksRun[position])
         tasksRun = listener.updateListTasks(tasksRun)
         tasksRun[position].state = holder.itemView.context.getString(State.InProgress.localState)
-        notifyDataSetChanged()
+        notifyItemChanged(position)
     }
 
     private fun clickToTimer(position: Int) {
@@ -155,14 +170,16 @@ class TasksAdapter(
         val matchingState = State.entries.find { "In Progress" == tasksRun[position].state }
 
         if (matchingState != null) {
-            holder.stateTask.text =  holder.itemView.context.getString(matchingState.localState)
+            holder.stateTask.text = holder.itemView.context.getString(matchingState.localState)
         } else {
-            holder.stateTask.text =  holder.itemView.context.getString(State.Open.localState)
+            holder.stateTask.text = holder.itemView.context.getString(State.Open.localState)
         }
     }
 
     private fun filterDate(currentFilter: TaskFilter) {
+        println(currentFilter)
         todayTasksRun = listener.filterTasksByDate(currentFilter, tasksRun)
+        println(todayTasksRun)
         notifyDataSetChanged()
     }
 

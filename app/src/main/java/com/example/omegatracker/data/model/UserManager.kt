@@ -17,6 +17,7 @@ class UserManager @Inject constructor(
     private var token: String? = null
 
     fun setUser(newToken: String, id: String, iconUrl: String, clientUrl: String) {
+        println(getToken() + getUserUrl() + getIcon())
         token = newToken
         sharedPreferences.edit {
             putString(USER_TOKEN, token)

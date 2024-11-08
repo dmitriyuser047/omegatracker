@@ -1,5 +1,7 @@
 package com.example.omegatracker.utils
 
+import java.text.SimpleDateFormat
+import java.util.Date
 import kotlin.time.Duration
 
 fun formatTimeDifference(estimatedTime: Duration, workedTime: Duration): String {
@@ -14,4 +16,9 @@ fun formatDuration(duration: Duration, isNegative: Boolean): String {
     }
     val formattedDuration = "%02d:%02d:%02d".format(hours, minutes, seconds)
     return if (isNegative) "-$formattedDuration" else formattedDuration
+}
+
+fun getCurrentDate(): String{
+    val sdf = SimpleDateFormat("yyyy-MM-dd")
+    return sdf.format(Date())
 }

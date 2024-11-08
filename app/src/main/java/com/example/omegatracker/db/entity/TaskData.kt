@@ -22,15 +22,17 @@ data class TaskData(
     @ColumnInfo("workedTime")
     val workedTimeLong: Long,
     @ColumnInfo("requiredTime")
-     val requiredTimeLong: Long,
+    val requiredTimeLong: Long,
     @ColumnInfo("isRunning")
     override var isRunning: Boolean?,
     @ColumnInfo("startTime")
     var startTimeLong: Long,
     @ColumnInfo("fullTime")
     var endTimeLong: Long,
-    override var dataCreate: Long
-): Task {
+    override var dataCreate: Long,
+    @ColumnInfo("iconUrl")
+    override val imageUrl: String?
+) : Task {
     override val workedTime: Duration
         get() = workedTimeLong.toDuration(DurationUnit.MINUTES)
     override val requiredTime: Duration

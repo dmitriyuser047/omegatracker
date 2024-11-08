@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import javax.inject.Singleton
 
-const val TYPE = "$"+"type"
+const val TYPE = "$" + "type"
 
 @Module
 class YouTrackModule() {
@@ -30,7 +30,7 @@ class YouTrackModule() {
     fun provideTypeJsonAdapterFactory(): PolymorphicJsonAdapterFactory<Value> {
         return PolymorphicJsonAdapterFactory.of(Value::class.java, TYPE)
             .withSubtype(Value.StateValue::class.java, "StateBundleElement")
-            .withSubtype(Value.PeriodValue::class.java,"PeriodValue")
+            .withSubtype(Value.PeriodValue::class.java, "PeriodValue")
             .withDefaultValue(null)
     }
 
@@ -42,7 +42,10 @@ class YouTrackModule() {
 
     @Singleton
     @Provides
-    fun provideMoshi(polymorphicAdapter: PolymorphicJsonAdapterFactory<Value>, objectJsonAdapter: ObjectJsonAdapter): Moshi {
+    fun provideMoshi(
+        polymorphicAdapter: PolymorphicJsonAdapterFactory<Value>,
+        objectJsonAdapter: ObjectJsonAdapter
+    ): Moshi {
         return Moshi.Builder()
             .add(objectJsonAdapter)
             .add(polymorphicAdapter)

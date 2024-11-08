@@ -1,6 +1,7 @@
 package com.example.omegatracker.di
 
 import com.example.omegatracker.data.YouTrackApi
+import com.example.omegatracker.di.scope.RetrofitScope
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -10,7 +11,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 @Module
 class RetrofitModule {
-    @AlternativeSingleton
+    @RetrofitScope
     @Provides
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi, baseUrl: String): Retrofit {
         return Retrofit.Builder()
@@ -19,7 +20,8 @@ class RetrofitModule {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
     }
-    @AlternativeSingleton
+
+    @RetrofitScope
     @Provides
     fun provideYouTrackApi(retrofit: Retrofit): YouTrackApi {
         return retrofit.create(YouTrackApi::class.java)

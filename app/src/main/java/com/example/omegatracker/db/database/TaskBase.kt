@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.omegatracker.db.dao.TaskDao
+import com.example.omegatracker.db.entity.HistoryTask
 import com.example.omegatracker.db.entity.TaskData
 
-@Database(entities = [TaskData::class], version = 1, exportSchema = false)
+@Database(entities = [TaskData::class, HistoryTask::class], version = 1)
 abstract class TaskBase : RoomDatabase() {
 
     abstract fun taskDao(): TaskDao

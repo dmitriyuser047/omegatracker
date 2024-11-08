@@ -40,9 +40,7 @@ class AppModule(private val application: Application) {
     @Singleton
     @Provides
     fun provideUserManager(context: Context, sharedPreferences: SharedPreferences): UserManager {
-       return UserManager(context,sharedPreferences)
+        return UserManager(context, sharedPreferences)
     }
-
-
 
 }

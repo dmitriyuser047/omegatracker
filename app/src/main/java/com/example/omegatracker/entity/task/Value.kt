@@ -20,11 +20,12 @@ sealed class Value {
         val type: String,
         @Json(name = "name")
         val name: String?
-    ): Value()
+    ) : Value()
+
     data class PeriodValue(
         @Json(name = TYPE)
         val type: String,
         @Json(name = "minutes")
         val minutes: Int?
-    ): Value()
+    ) : Value()
 }

@@ -1,6 +1,6 @@
 package com.example.omegatracker.di
 
-import com.example.omegatracker.ui.tasks.TasksTracking
+import com.example.omegatracker.ui.main.AddCustomTask
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -9,7 +9,7 @@ import javax.inject.Singleton
 class TasksModule {
     @Singleton
     @Provides
-    fun provideTaskTracking(): TasksTracking {
-        return TasksTracking()
+    fun provideTaskTracking(): AddCustomTask {
+        return AddCustomTask()
     }
 }

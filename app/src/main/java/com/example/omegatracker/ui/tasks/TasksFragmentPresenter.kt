@@ -5,23 +5,32 @@ import com.example.omegatracker.data.RepositoryImpl
 import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
-import com.example.omegatracker.ui.base.BasePresenter
+import com.example.omegatracker.ui.base.activity.BasePresenter
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+class TasksFragmentPresenter @Inject constructor(private val repository: RepositoryImpl) :
+    BasePresenter<TasksFragmentView>() {
 
-class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl) : BasePresenter<TasksView>() {
-
-    private val component = OmegaTrackerApplication.appComponent
     private var taskController: TasksService.Controller? = null
-    init {
+
+    fun getTasksFromData() {
         launch {
-            repositoryImpl.getTasks().collect { list ->
-                restartTasks(list)
-                viewState.showTasks(updateListTasks(list))
+            repository.getTasks().collect { list ->
+                //restartTasks(list)
+                viewState.setTasks(updateListTasks(list))
             }
         }
     }
+
+    fun checkTasksUpdates() {
+        launch {
+            val tasks = repository.getTasksFromDatabase()
+            restartTasks(tasks)
+            viewState.setTasks(updateListTasks(tasks))
+        }
+    }
+
 
     private fun restartTasks(list: List<TaskRun>) {
         list.filter { it.isRunning == true }.forEach {
@@ -34,27 +43,24 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         taskController = binder
     }
 
-    fun intentToAuth() {
-        component.userManager().exit()
-        viewState.navigateTo(Screens.AuthScreen)
-    }
-
     fun intentToTimer(taskRuns: List<TaskRun>, taskRun: TaskRun) {
         launch {
-            repositoryImpl.updateTasksBase(taskRuns)
+            repository.updateTasksBase(taskRuns)
         }
-        viewState.navigateTo(Screens.TimerScreen(taskRun))
+        viewState.navigateScreen(Screens.TimerScreen(taskRun))
     }
 
     fun filterTasksByDate(filter: TaskFilter, tasksRun: List<TaskRun>): List<TaskRun> {
         return when (filter) {
             TaskFilter.AllTasks -> tasksRun
-            TaskFilter.Today -> tasksRun.filter { repositoryImpl.isToday(it.dataCreate) || it.isRunning == true}
+            TaskFilter.Today -> tasksRun.filter { repository.isToday(it.dataCreate) || it.isRunning == true }
         }
     }
 
     fun updateListTasks(list: List<TaskRun>): List<TaskRun> {
-        val updatedList = list.sortedByDescending { it.isRunning }
+        val updatedList = list.sortedWith(compareByDescending<TaskRun>{ it.isRunning }
+            .thenByDescending { it.dataCreate })
+
         return updatedList
     }
 
@@ -68,9 +74,10 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
             list
         }
     }
+
     fun startTask(taskRun: TaskRun) {
         launch {
-            repositoryImpl.updateTask(taskRun)
+            repository.updateTask(taskRun)
         }
         taskController?.startTask(taskRun)
         getUpdateTasksTime(taskRun)
@@ -80,9 +87,15 @@ class TasksPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         launch {
             taskController?.getUpdatedTask(taskRun.id)?.collect {
                 viewState.setNewTasksTime(it)
-                println("time in presenter - " + it.fullTime)
             }
         }
     }
 
+    fun intentToAuth() {
+        OmegaTrackerApplication.appComponent.userManager().exit()
+        launch {
+            repository.deleteData()
+            viewState.navigateScreen(Screens.AuthScreen)
+        }
+    }
 }

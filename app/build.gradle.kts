@@ -19,7 +19,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -38,6 +37,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        dataBinding = true
         viewBinding = true
         buildConfig = true
     }
@@ -50,6 +50,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.test:core-ktx:1.6.1")
     implementation("androidx.test.ext:junit-ktx:1.2.1")
+    implementation(libs.androidx.databinding.runtime)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -90,10 +91,11 @@ dependencies {
     //date time
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 
+    implementation ("com.squareup.picasso:picasso:2.8")
 
-    implementation("androidx.room:room-runtime:2.5.0")
-    implementation("androidx.room:room-ktx:2.5.0")
-    ksp("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
 
     implementation ("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 

@@ -1,4 +1,4 @@
-package com.example.omegatracker.ui.base
+package com.example.omegatracker.ui.base.activity
 
 import com.example.omegatracker.OmegaTrackerApplication
 import com.example.omegatracker.R
@@ -34,5 +34,5 @@ open class BasePresenter<T : BaseView> : OmegaPresenter<T>(), CoroutineScope {
             }
         }
 
-    override val coroutineContext = supervisorJob + Dispatchers.Main + coroutineException
+    override val coroutineContext = supervisorJob + Dispatchers.Main  + coroutineException
 }

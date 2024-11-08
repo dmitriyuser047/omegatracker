@@ -1,43 +1,39 @@
 package com.example.omegatracker.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
+import com.example.omegatracker.db.entity.HistoryData
+import com.example.omegatracker.db.entity.HistoryTask
 import com.example.omegatracker.db.entity.TaskData
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TaskDao {
     @Query("SELECT * FROM taskdata")
-    fun getAllTasks(): List<TaskData>
+    fun getAllFlowTasks(): Flow<List<TaskData>>
+
+    @Query("SELECT * FROM taskdata")
+    suspend fun getAllTasks(): List<TaskData>
 
     @Upsert
     suspend fun upsertTasks(taskData: TaskData)
 
-    @Query ("SELECT * FROM taskdata WHERE id  = :taskId")
+    @Query("SELECT * FROM taskdata WHERE id  = :taskId")
     suspend fun findTaskById(taskId: String): TaskData?
 
-    @Delete
-    suspend fun deleteTask(taskData: TaskData)
+    @Query("DELETE FROM taskdata WHERE id = :taskId")
+    suspend fun deleteTask(taskId: String)
 
-    @Query("SELECT * FROM taskdata WHERE isRunning = 'true'")
-    suspend fun getRunningTasks(): List<TaskData>
+    @Query("DELETE FROM taskdata")
+    suspend fun deleteAllTasks()
 
-    @Query("SELECT * FROM taskdata WHERE isRunning = 'false'")
-    suspend fun getNotRunningTasks(): List<TaskData>
+    @Transaction
+    @Query("SELECT * FROM TaskData")
+    suspend fun getAllHistoryTask(): List<HistoryData>
 
-
-    @Query("SELECT * FROM taskdata WHERE projectName LIKE :projectName")
-    suspend fun findTasksByProjectName(projectName: String): List<TaskData>
-
-    @Query("SELECT * FROM taskdata WHERE name LIKE :taskName")
-    suspend fun findTasksByName(taskName: String): List<TaskData>
-
-    @Query("SELECT * FROM taskdata WHERE workedTime = 0")
-    suspend fun getTasksWithNoWorkedTime(): List<TaskData>
-
-    @Query("SELECT * FROM taskdata WHERE description IS NULL")
-    suspend fun findTasksWithNoDescription(): List<TaskData>
-
-
+    @Insert
+    suspend fun upsertHistoryTask(historyTask: HistoryTask)
 }

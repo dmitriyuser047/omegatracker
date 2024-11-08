@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
-import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.omegatracker.OmegaTrackerApplication
@@ -17,14 +17,12 @@ import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
-import com.example.omegatracker.ui.base.BaseActivity
+import com.example.omegatracker.ui.base.activity.BaseActivity
 import com.example.omegatracker.utils.formatTimeDifference
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import kotlinx.coroutines.launch
 
 
-class TimerActivity: BaseActivity(), TimerView {
+class TimerActivity : BaseActivity(), TimerView {
 
     private val repositoryImpl = OmegaTrackerApplication.appComponent.repository()
 
@@ -62,6 +60,11 @@ class TimerActivity: BaseActivity(), TimerView {
         startService(intent)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        this.finish()
+    }
+
     override fun initialization() {
         progressBar = binding.customProgressBar
     }
@@ -90,9 +93,25 @@ class TimerActivity: BaseActivity(), TimerView {
             }
         }
         binding.completeButton.setOnClickListener {
+            completeDialog()
+        }
+    }
+
+    private fun completeDialog() {
+        println("AlertDialog")
+        val dialog = AlertDialog.Builder(this)
+        dialog.setMessage("Точно ли вы хотите завершить задачу?")
+        dialog.setPositiveButton("Завершить") { _, _ ->
             presenter.completeTask(taskRunner)
             updateButtonVisibility(TimerButtons.COMPLETE)
         }
+        dialog.setNegativeButton("Назад") { _,_ ->
+        }
+        dialog.show()
+    }
+
+    override fun navigateScreen(screens: Screens) {
+
     }
 
     override fun checkUpdateTask() {
@@ -114,14 +133,17 @@ class TimerActivity: BaseActivity(), TimerView {
                 taskRunner.state = getString(State.InProgress.localState)
                 binding.state.text = getString(State.InProgress.localState)
             }
+
             State.Open -> {
                 taskRunner.state = getString(State.Open.localState)
                 binding.state.text = getString(State.Open.localState)
             }
+
             State.InPause -> {
                 taskRunner.state = getString(State.InPause.localState)
                 binding.state.text = getString(State.InPause.localState)
             }
+
             State.Stopped -> {
                 taskRunner.state = getString(State.Stopped.localState)
                 binding.state.text = getString(State.Stopped.localState)
@@ -130,7 +152,7 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
     override fun navigateTo(screens: Screens) {
-        createIntent(this, screens)
+        startScreen(this, screens)
     }
 
     override fun setView(taskRun: TaskRun) {
@@ -142,7 +164,6 @@ class TimerActivity: BaseActivity(), TimerView {
     }
 
 
-
     override fun setTimer(taskRun: TaskRun) {
         lifecycleScope.launch {
             presenter.getTimeForTimer(taskRun)?.collect {
@@ -150,6 +171,7 @@ class TimerActivity: BaseActivity(), TimerView {
             }
         }
     }
+
     override fun backToTasks() {
         binding.backButton.setOnClickListener {
             presenter.backAction()

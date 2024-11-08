@@ -1,7 +1,6 @@
 package com.example.omegatracker.entity.task
 
 import android.os.Parcelable
-import com.example.omegatracker.entity.task.Task
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 import kotlin.time.Duration
@@ -17,7 +16,8 @@ data class TaskRun(
     override val requiredTime: @RawValue Duration,
     override var isRunning: Boolean?,
     override val name: String,
-    var spentTime:  @RawValue Duration,
-    var fullTime:  @RawValue Duration,
-    override var dataCreate: Long
-): Task, Parcelable
+    var spentTime: @RawValue Duration,
+    var fullTime: @RawValue Duration,
+    override var dataCreate: Long,
+    override val imageUrl: String?
+) : Task, Parcelable

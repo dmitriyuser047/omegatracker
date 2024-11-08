@@ -13,11 +13,12 @@ class TasksManager {
     private val taskRuns: MutableMap<String, TaskRun> = mutableMapOf()
 
     fun launchTaskRunner(taskRun: TaskRun) {
-        if (!tasksRunners.containsKey(taskRun.id)) {
-            val taskRunner = OmegaTrackerApplication.appComponent.tasksRunner()
-            tasksRunners[taskRun.id] = taskRunner
+        if (!tasksRunners.containsKey(taskRun.id)) { // Проверяем наличие в tasksRunners
+            tasksRunners[taskRun.id] = TasksRunner()
             taskRuns[taskRun.id] = taskRun
-            taskRunner.launchTask(taskRun)
+            tasksRunners[taskRun.id]?.launchTask(taskRun)
+        } else {
+            println("TaskRunner for task ${taskRun.id} already exists.")
         }
     }
 
@@ -33,7 +34,9 @@ class TasksManager {
         tasksRunners.forEach {
             tasksRunners.remove(it.key)
         }
-        taskRuns.clear()
+        taskRuns.forEach {
+            taskRuns.remove(it.key)
+        }
     }
 
     fun playAllTasksRunners() {
@@ -45,6 +48,7 @@ class TasksManager {
     }
 
     fun getTaskUpdates(taskId: String): Flow<TaskRun> {
+        println("TasksManager updates ")
         return tasksRunners[taskId]?.taskUpdates ?: flowOf()
     }
 

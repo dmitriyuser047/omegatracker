@@ -10,4 +10,5 @@ interface Task {
     val requiredTime: Duration
     var isRunning: Boolean?
     var dataCreate: Long
+    val imageUrl: String?
 }

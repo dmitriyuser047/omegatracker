@@ -1,19 +1,19 @@
 package com.example.omegatracker.ui.timer
 
 import com.example.omegatracker.data.RepositoryImpl
-import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.entity.TimerButtons
 import com.example.omegatracker.entity.task.State
+import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
-import com.example.omegatracker.ui.base.BasePresenter
+import com.example.omegatracker.ui.base.activity.BasePresenter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl)
-    : BasePresenter<TimerView>() {
+class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryImpl) :
+    BasePresenter<TimerView>() {
 
     private var controller: TasksService.Controller? = null
 
@@ -47,6 +47,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
             }
         }
     }
+
     private fun setProgressBarProgress(taskRun: TaskRun) {
         val requiredTime =
             taskRun.requiredTime.inWholeMinutes * 60 * 1000 - taskRun.spentTime.inWholeMilliseconds
@@ -54,7 +55,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         val maxProgress = (requiredTime / updateInterval).toFloat()
         var initialProgress = (taskRun.spentTime.inWholeMilliseconds / updateInterval).toFloat()
 
-       launch {
+        launch {
             while (taskRun.isRunning == true && initialProgress <= maxProgress) {
                 initialProgress++
                 viewState.setAnimation(initialProgress, maxProgress)
@@ -88,5 +89,11 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         viewState.setView(taskRun)
     }
 
-    fun completeTask(taskRun: TaskRun) {}
+    fun completeTask(taskRun: TaskRun) {
+        controller?.pauseTask(taskRun)
+        launch {
+            repositoryImpl.updateTask(taskRun)
+            repositoryImpl.completeTask(taskRun)
+        }
+    }
 }

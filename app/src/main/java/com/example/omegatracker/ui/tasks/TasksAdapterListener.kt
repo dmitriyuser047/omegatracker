@@ -8,4 +8,5 @@ interface TasksAdapterListener {
     fun clickToTimer(taskRun: TaskRun, list: List<TaskRun>)
     fun startTask(taskRun: TaskRun)
     fun filterTasksByDate(filter: TaskFilter, tasksRun: List<TaskRun>): List<TaskRun>
+//    fun getTaskIcon(imageUrl: String?)
 }

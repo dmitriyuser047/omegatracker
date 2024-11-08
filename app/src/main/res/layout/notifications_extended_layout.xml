@@ -1,0 +1,85 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="16dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+        <TextView
+            android:id="@+id/notification_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Задача"
+            android:textSize="18sp"
+            android:fontFamily="@font/rubik"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"/>
+
+        <TextView
+            android:id="@+id/notification_task_name_extended"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="Название задачи"
+            android:fontFamily="@font/rubik"
+            android:textSize="18sp"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+    <TextView
+        android:id="@+id/notification_title_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Время"
+        android:textSize="18sp"
+        android:fontFamily="@font/rubik_medium"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"/>
+
+        <TextView
+            android:id="@+id/notification_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="time"
+            android:textSize="18sp"
+            android:layout_marginStart="30dp"
+            android:fontFamily="@font/rubik"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <Button
+        android:id="@+id/notification_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play"
+        android:textSize="16sp"
+        android:fontFamily="@font/rubik_medium"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"/>
+
+    <Button
+        android:id="@+id/notification_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Pause"
+        android:fontFamily="@font/rubik"
+        android:textSize="16sp"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"/>/>
+
+    </LinearLayout>
+</LinearLayout>
