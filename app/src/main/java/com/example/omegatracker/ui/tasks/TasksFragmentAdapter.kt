@@ -13,6 +13,7 @@ import com.example.omegatracker.R
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.utils.formatTimeDifference
+import com.example.omegatracker.utils.formatTimeDifferenceShort
 
 enum class TaskFilter {
     Today,
@@ -127,7 +128,7 @@ class TasksFragmentAdapter(
             nameTask.text = task.name
             nameProjectTask.text = task.projectName
             stateTask.text = task.state
-            timeTask.text = formatTimeDifference(task.requiredTime, task.workedTime)
+            timeTask.text = formatTimeDifferenceShort(task.requiredTime, task.spentTime)
         }
     }
 
@@ -177,9 +178,7 @@ class TasksFragmentAdapter(
     }
 
     private fun filterDate(currentFilter: TaskFilter) {
-        println(currentFilter)
         todayTasksRun = listener.filterTasksByDate(currentFilter, tasksRun)
-        println(todayTasksRun)
         notifyDataSetChanged()
     }
 

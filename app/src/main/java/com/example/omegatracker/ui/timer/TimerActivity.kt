@@ -122,8 +122,7 @@ class TimerActivity : BaseActivity(), TimerView {
         }
     }
 
-    override fun setAnimation(newProgress: Float, maxProgress: Float) {
-        progressBar.setMaxProgress(maxProgress)
+    override fun setAnimation(newProgress: Float) {
         progressBar.setProgress(newProgress)
     }
 
@@ -168,6 +167,7 @@ class TimerActivity : BaseActivity(), TimerView {
         lifecycleScope.launch {
             presenter.getTimeForTimer(taskRun)?.collect {
                 binding.time.text = formatTimeDifference(taskRun.requiredTime, it.fullTime)
+                presenter.setProgressBarProgress(it)
             }
         }
     }

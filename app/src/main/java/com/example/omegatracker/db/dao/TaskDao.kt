@@ -31,9 +31,18 @@ interface TaskDao {
     suspend fun deleteAllTasks()
 
     @Transaction
-    @Query("SELECT * FROM TaskData")
-    suspend fun getAllHistoryTask(): List<HistoryData>
+    @Query("SELECT * FROM historytask ORDER by date desc LIMIT :pageSize OFFSET :offset")
+    suspend fun getAllHistoryData(pageSize: Int, offset: Int): List<HistoryData>
+
+    @Query("SELECT COUNT(*) FROM historytask")
+    suspend fun getHistoryCount(): Int
 
     @Insert
     suspend fun upsertHistoryTask(historyTask: HistoryTask)
+
+    @Query("SELECT * FROM historytask")
+    suspend fun getAllHistoryTasks(): List<HistoryTask>
+
+    @Query("SELECT * FROM historytask WHERE date BETWEEN :startDate AND :endDate")
+    suspend fun getDataBetweenDates(startDate: Long, endDate: Long): List<HistoryData>
 }

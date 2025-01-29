@@ -82,8 +82,4 @@ class TimerProgressBar @JvmOverloads constructor(
         invalidate()
     }
 
-    fun setMaxProgress(maxProgress: Float) {
-        this.maxProgress = maxProgress
-        invalidate()
-    }
 }

@@ -58,7 +58,7 @@ class TasksFragmentPresenter @Inject constructor(private val repository: Reposit
     }
 
     fun updateListTasks(list: List<TaskRun>): List<TaskRun> {
-        val updatedList = list.sortedWith(compareByDescending<TaskRun>{ it.isRunning }
+        val updatedList = list.sortedWith(compareByDescending<TaskRun> { it.isRunning }
             .thenByDescending { it.dataCreate })
 
         return updatedList

@@ -1,6 +1,10 @@
 package com.example.omegatracker.data
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.omegatracker.OmegaTrackerApplication
+import com.example.omegatracker.db.entity.HistoryData
 import com.example.omegatracker.db.entity.HistoryTask
 import com.example.omegatracker.db.entity.TaskData
 import com.example.omegatracker.entity.HistoryItem
@@ -8,7 +12,7 @@ import com.example.omegatracker.entity.User
 import com.example.omegatracker.entity.task.State
 import com.example.omegatracker.entity.task.TaskFromJson
 import com.example.omegatracker.entity.task.TaskRun
-import com.example.omegatracker.utils.getCurrentDate
+import com.example.omegatracker.ui.history.HistoryItemSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -19,6 +23,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -41,7 +47,7 @@ class RepositoryImpl : Repository {
         return youTrackApi.signIn("Bearer $token")
     }
 
-    override suspend fun getTasks(): Flow<List<TaskRun>> = flow{
+    override suspend fun getTasks(): Flow<List<TaskRun>> = flow {
         userToken = component.userManager().getToken()
         println("Token: $userToken")
 
@@ -253,24 +259,24 @@ class RepositoryImpl : Repository {
 
     override suspend fun getTasksFromDatabase(): List<TaskRun> {
         return taskDao.getAllTasks().map { task ->
-                TaskRun(
-                    id = task.id,
-                    startTime = task.startTimeLong.toDuration(DurationUnit.MILLISECONDS),
-                    name = task.name,
-                    description = task.description,
-                    projectName = task.projectName,
-                    state = State.Open.toString(),
-                    workedTime = task.workedTime,
-                    requiredTime = task.requiredTime,
-                    isRunning = task.isRunning,
-                    spentTime = (task.endTimeLong - task.startTimeLong).toDuration(DurationUnit.MILLISECONDS),
-                    fullTime = task.workedTime + (task.endTimeLong.toDuration(DurationUnit.MILLISECONDS) - task.startTimeLong.toDuration(
-                        DurationUnit.MILLISECONDS
-                    )),
-                    dataCreate = task.dataCreate,
-                    imageUrl = task.imageUrl
-                )
-            }
+            TaskRun(
+                id = task.id,
+                startTime = task.startTimeLong.toDuration(DurationUnit.MILLISECONDS),
+                name = task.name,
+                description = task.description,
+                projectName = task.projectName,
+                state = State.Open.toString(),
+                workedTime = task.workedTime,
+                requiredTime = task.requiredTime,
+                isRunning = task.isRunning,
+                spentTime = (task.endTimeLong - task.startTimeLong).toDuration(DurationUnit.MILLISECONDS),
+                fullTime = task.workedTime + (task.endTimeLong.toDuration(DurationUnit.MILLISECONDS) - task.startTimeLong.toDuration(
+                    DurationUnit.MILLISECONDS
+                )),
+                dataCreate = task.dataCreate,
+                imageUrl = task.imageUrl
+            )
+        }
     }
 
     override fun differenceCheckTaskRun(taskRun: TaskRun): Flow<TaskRun> = flow {
@@ -283,45 +289,48 @@ class RepositoryImpl : Repository {
         taskDao.deleteAllTasks()
     }
 
-    override suspend fun getHistoryTasks(): List<HistoryItem> {
-        val historiesData = taskDao.getAllHistoryTask()
-        println(historiesData.groupBy { it.taskData.endTimeLong })
-        val historyItems = historiesData.flatMap { historyData ->
-            val taskData = historyData.taskData
-            historyData.historyTasks.map { historyTask ->
-                HistoryItem(
-                    historyTaskName = taskData.name,
-                    historyTaskProject = taskData.projectName ?: "Нет проекта",
-                    startTime = historyTask.startTime,
-                    endTime = historyTask.endTime,
-                    date = historyTask.date,
-                    historyTaskId = historyTask.taskId
-                )
-            }
-        }
-        return historyItems
+    override fun getHistoryData(pageSize: Int): Flow<PagingData<HistoryItem>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = pageSize,
+                enablePlaceholders = false,
+                initialLoadSize = pageSize
+            ),
+            pagingSourceFactory = { HistoryItemSource(taskDao) }
+        ).flow
     }
 
     override suspend fun completeTask(taskRun: TaskRun) {
+        val currentTime = Calendar.getInstance().timeInMillis
         taskDao.upsertHistoryTask(
             HistoryTask(
                 taskId = taskRun.id,
-                startTime = taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
-                endTime = taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
-                date = getCurrentDate()
+                startTime = currentTime - 4 * 60 * 60 * 1000,//taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
+                endTime = currentTime,//(taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
+                date = currentTime
             )
         )
     }
+
 
     override suspend fun deleteTask(taskRun: TaskRun) {
         taskDao.deleteTask(taskId = taskRun.id)
     }
 
-//    override suspend fun getImageUrlForTask(imageUrl: String?): String? {
-//        val baseUrl = component.userManager().getUserUrl()
-//        println(baseUrl + imageUrl)
-//        return youTrackApi.getImageForTask(baseUrl + imageUrl,"Bearer $userToken")
-//
-//    }
+    override suspend fun getAllHistoryTasks(): List<HistoryTask> {
+        return taskDao.getAllHistoryTasks()
+    }
+
+    override fun getDayOfWeek(date: Date): String {
+        val instant = Instant.fromEpochMilliseconds(date.time)
+
+        val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+        return localDate.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercaseChar() }
+    }
+
+    override suspend fun getDataBetweenDate(time: Pair<Long, Long>): List<HistoryData> {
+        return taskDao.getDataBetweenDates(time.first, time.second)
+    }
 
 }

@@ -12,11 +12,13 @@ import com.example.omegatracker.R
 import com.example.omegatracker.databinding.ActivityMainBinding
 import com.example.omegatracker.di.AppComponent
 import com.example.omegatracker.entity.Fragments
+import com.example.omegatracker.entity.ScreensButtons
 import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.activity.BaseActivity
 import com.example.omegatracker.ui.history.HistoryFragment
+import com.example.omegatracker.ui.statistics.StatisticsFragment
 import com.example.omegatracker.ui.tasks.TasksFragment
 
 class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
@@ -44,12 +46,15 @@ class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
     }
 
     override fun initialization() {
-        startFragment(Fragments.ALL_TASKS_FRAGMENT, false)
+        startFragment(Fragments.TASKS_FRAGMENT, false)
         binding.addTask.setOnClickListener {
             addTaskButton()
         }
         binding.historyButton.setOnClickListener {
             startFragment(Fragments.HISTORY_FRAGMENT, true)
+        }
+        binding.statisticsButton.setOnClickListener {
+            startFragment(Fragments.STATISTICS_FRAGMENT, true)
         }
     }
 
@@ -66,9 +71,18 @@ class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
 
     override fun startFragment(fragment: Fragments, addBackStack: Boolean) {
         val fragmentInstance = when (fragment) {
-                Fragments.ALL_TASKS_FRAGMENT -> TasksFragment()
-                Fragments.HISTORY_FRAGMENT -> HistoryFragment()
-                Fragments.STATISTICS_FRAGMENT -> TODO()
+                Fragments.TASKS_FRAGMENT -> {
+                    updateStateBottomNavigation(ScreensButtons.MAIN_SCREEN)
+                    TasksFragment()
+                }
+                Fragments.HISTORY_FRAGMENT -> {
+                    updateStateBottomNavigation(ScreensButtons.HISTORY_SCREEN)
+                    HistoryFragment()
+                }
+                Fragments.STATISTICS_FRAGMENT -> {
+                    updateStateBottomNavigation(ScreensButtons.STATISTICS_SCREEN)
+                    StatisticsFragment()
+                }
             }
         val transaction = supportFragmentManager.beginTransaction()
             .replace(container, fragmentInstance, fragment.javaClass.simpleName)
@@ -110,5 +124,24 @@ class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
 
     override fun onTaskAdded(task: TaskRun) {
         presenter.addNewTask(task)
+    }
+
+    private fun updateStateBottomNavigation(state: ScreensButtons) {
+        when (state) {
+            ScreensButtons.HISTORY_SCREEN -> {
+                binding.historyButton.setImageResource(R.drawable.time_clicked)
+                binding.statisticsButton.setImageResource(R.drawable.statics)
+            }
+            ScreensButtons.MAIN_SCREEN -> {
+                binding.historyButton.setImageResource(R.drawable.time)
+                binding.statisticsButton.setImageResource(R.drawable.statics)
+                binding.addTask.setImageResource(R.drawable.add)
+            }
+            ScreensButtons.STATISTICS_SCREEN -> {
+                binding.historyButton.setImageResource(R.drawable.time)
+                binding.statisticsButton.setImageResource(R.drawable.statistics_clicked)
+            }
+        }
+
     }
 }

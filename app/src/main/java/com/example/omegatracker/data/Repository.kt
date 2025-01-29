@@ -1,10 +1,14 @@
 package com.example.omegatracker.data
 
+import androidx.paging.PagingData
+import com.example.omegatracker.db.entity.HistoryData
+import com.example.omegatracker.db.entity.HistoryTask
 import com.example.omegatracker.entity.HistoryItem
 import com.example.omegatracker.entity.User
 import com.example.omegatracker.entity.task.TaskFromJson
 import com.example.omegatracker.entity.task.TaskRun
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 interface Repository {
     suspend fun getUser(token: String, clientUrl: String): User
@@ -21,8 +25,12 @@ interface Repository {
     fun isToday(timestamp: Long): Boolean
     suspend fun addNewDataTaskToBase(task: TaskRun)
     suspend fun deleteData()
-    suspend fun getHistoryTasks(): List<HistoryItem>
+    fun getHistoryData(pageSize: Int):  Flow<PagingData<HistoryItem>>
     suspend fun completeTask(taskRun: TaskRun)
     suspend fun deleteTask(taskRun: TaskRun)
+    suspend fun getAllHistoryTasks(): List<HistoryTask>
+    fun getDayOfWeek(date: Date): String
+    suspend fun getDataBetweenDate(time: Pair<Long, Long>): List<HistoryData>
+
 //    suspend fun getImageUrlForTask(imageUrl: String?): String?
 }

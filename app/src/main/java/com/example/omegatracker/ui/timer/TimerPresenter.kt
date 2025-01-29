@@ -7,7 +7,6 @@ import com.example.omegatracker.entity.task.TaskRun
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.activity.BasePresenter
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,6 +15,7 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
     BasePresenter<TimerView>() {
 
     private var controller: TasksService.Controller? = null
+    private var timerEstimatedTimeType: Boolean = true
 
     fun backAction() {
         viewState.navigateTo(Screens.TasksScreen)
@@ -48,19 +48,16 @@ class TimerPresenter @Inject constructor(private val repositoryImpl: RepositoryI
         }
     }
 
-    private fun setProgressBarProgress(taskRun: TaskRun) {
-        val requiredTime =
-            taskRun.requiredTime.inWholeMinutes * 60 * 1000 - taskRun.spentTime.inWholeMilliseconds
-        val updateInterval = 1000L
-        val maxProgress = (requiredTime / updateInterval).toFloat()
-        var initialProgress = (taskRun.spentTime.inWholeMilliseconds / updateInterval).toFloat()
-
-        launch {
-            while (taskRun.isRunning == true && initialProgress <= maxProgress) {
-                initialProgress++
-                viewState.setAnimation(initialProgress, maxProgress)
-                delay(updateInterval)
-            }
+    fun setProgressBarProgress(taskRun: TaskRun) {
+        val progress = if (timerEstimatedTimeType) {
+            (taskRun.spentTime / taskRun.requiredTime * 100).toFloat()
+        } else {
+            ((taskRun.requiredTime - taskRun.spentTime) / taskRun.requiredTime * 100).toFloat()
+        }
+        if (progress < 100) {
+           viewState.setAnimation(progress)
+        } else {
+           viewState.setAnimation(progress)
         }
 
     }

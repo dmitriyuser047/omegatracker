@@ -9,6 +9,7 @@ import com.example.omegatracker.service.TasksRunner
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.auth.AuthInstruction
 import com.example.omegatracker.ui.main.AddCustomTask
+import com.example.omegatracker.ui.statistics.StatisticsGraphHelper
 import dagger.Component
 import javax.inject.Singleton
 
@@ -21,6 +22,7 @@ import javax.inject.Singleton
         TasksModule::class,
         ServiceModule::class,
         TimerModule::class,
+        StatisticsModule::class
     ]
 )
 interface AppComponent {
@@ -33,4 +35,5 @@ interface AppComponent {
     fun tasksService(): TasksService
     fun tasksRunner(): TasksRunner
     fun addTaskDialog(): AddCustomTask
+    fun statisticsGraphHelper(): StatisticsGraphHelper
 }
