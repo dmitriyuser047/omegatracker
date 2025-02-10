@@ -12,6 +12,7 @@ import com.example.omegatracker.db.entity.HistoryData
 import com.example.omegatracker.entity.Periods
 import com.example.omegatracker.ui.Screens
 import com.example.omegatracker.ui.base.fragment.BaseFragment
+import com.example.omegatracker.ui.statistics.graph.StatisticsGraphHelper
 
 class StatisticsFragment: BaseFragment(), StatisticsFragmentView {
 
@@ -53,12 +54,15 @@ class StatisticsFragment: BaseFragment(), StatisticsFragmentView {
     override fun getStatisticsForGraph(historyData: List<HistoryData>, periods: Periods) {
         statisticsGraphHelper.setHistoryData(historyData)
         statisticsGraph.setYLabels(statisticsGraphHelper.getYLabels())
-        statisticsGraph.timePoints = statisticsGraphHelper.getTimeDays()
+        statisticsGraph.dayPoints = statisticsGraphHelper.getTimeDays()
+        statisticsGraph.hoursPoints = statisticsGraphHelper.getHoursDay()
         when (periods) {
             Periods.DAY -> {
+                statisticsGraph.isWeek = false
                 statisticsGraph.setXLabels(context?.resources?.getStringArray(R.array.day_labels)?.toList() ?: emptyList() )
             }
             Periods.WEEK -> {
+                statisticsGraph.isWeek = true
                 statisticsGraph.setXLabels(context?.resources?.getStringArray(R.array.week_labels)?.toList() ?: emptyList())
             }
         }

@@ -7,7 +7,10 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.example.omegatracker.R
-
+import com.example.omegatracker.ui.statistics.graph.AxisDrawer
+import com.example.omegatracker.ui.statistics.graph.HoursGraphRenderer
+import com.example.omegatracker.ui.statistics.graph.Paints
+import com.example.omegatracker.ui.statistics.graph.WeekGraphRenderer
 
 class StatisticsGraph @JvmOverloads constructor(
     context: Context,
@@ -19,16 +22,22 @@ class StatisticsGraph @JvmOverloads constructor(
 
     private val axisDrawer = AxisDrawer(paints)
 
+    // Рендереры для графиков по часам и неделям – они будут создаваться/обновляться при каждом вызове onDraw
+    private var hoursRenderer: HoursGraphRenderer? = null
+    private var weekRenderer: WeekGraphRenderer? = null
+
     private val backgroundDrawable =
         ContextCompat.getDrawable(context, R.drawable.background_statistics_graph)
 
     private var yLabels = emptyList<String>()
     private var xLabels = emptyList<String>()
-    var timePoints = emptyList<Triple<Int, Long, Long>>()
+    var dayPoints = emptyList<Triple<Int, Long, Long>>()
+    var hoursPoints = emptyList<Triple<Long, Long, Long>>()
 
     private var graphWidth = 0f
     private var lastTouchX = 0f
     private var lastScrollX = 0f
+    var isWeek = false
 
     fun setYLabels(labels: List<String>) {
         yLabels = labels.ifEmpty {
@@ -50,7 +59,6 @@ class StatisticsGraph @JvmOverloads constructor(
                 lastTouchX = event.x
                 return true
             }
-
             MotionEvent.ACTION_MOVE -> {
                 if (graphWidth > width) {
                     val deltaX = event.x - lastTouchX
@@ -61,11 +69,9 @@ class StatisticsGraph @JvmOverloads constructor(
                 }
                 return true
             }
-
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 return true
             }
-
             else -> return super.onTouchEvent(event)
         }
     }
@@ -81,9 +87,15 @@ class StatisticsGraph @JvmOverloads constructor(
         )
         backgroundDrawable?.draw(canvas)
 
-        graphWidth = axisDrawer.drawX(canvas, xLabels, width.toFloat(), height.toFloat())
-        axisDrawer.drawY(canvas, yLabels, height.toFloat(), graphWidth, scrollX.toFloat())
-        axisDrawer.drawWeekMainLine(canvas, timePoints, graphWidth,width.toFloat(), height.toFloat())
-    }
+        graphWidth = axisDrawer.drawXAxis(canvas, xLabels, width.toFloat(), height.toFloat())
+        axisDrawer.drawYAxis(canvas, yLabels, height.toFloat(), graphWidth, scrollX.toFloat())
 
+        if (isWeek) {
+            weekRenderer = WeekGraphRenderer(paints, dayPoints, axisDrawer.maxHeightY)
+            weekRenderer?.render(canvas, graphWidth, width.toFloat(), height.toFloat())
+        } else {
+            hoursRenderer = HoursGraphRenderer(paints, xLabels, hoursPoints, axisDrawer.maxHeightY)
+            hoursRenderer?.render(canvas, graphWidth, height.toFloat())
+        }
+    }
 }

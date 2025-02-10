@@ -30,4 +30,7 @@ data class HistoryData(
 
     override val date: Date
         get() = Date(historyTask.date)
+
+    override val spentTime: Long
+        get() = historyTask.spentTime
 }

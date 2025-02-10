@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import com.example.omegatracker.OmegaTrackerApplication
@@ -83,6 +84,15 @@ class HistoryFragment : BaseFragment(), HistoryFragmentView, HistoryFragmentList
                 adapter.submitData(lifecycle, historyItems)
                 showProgressBar(false)
             }
+        }
+    }
+
+    private fun clickBackButton() {
+        binding.backButton.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStackImmediate(
+                null,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
         }
     }
 

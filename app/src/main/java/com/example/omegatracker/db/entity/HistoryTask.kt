@@ -18,6 +18,7 @@ data class HistoryTask(
     val taskId: String,
     val startTime: Long,
     val endTime: Long,
+    val spentTime: Long,
     val date: Long
 )
 

@@ -1,4 +1,4 @@
-package com.example.omegatracker.ui.statistics
+package com.example.omegatracker.ui.statistics.graph
 
 import com.example.omegatracker.db.entity.HistoryData
 import com.example.omegatracker.utils.formatDurationToGraph
@@ -44,6 +44,16 @@ class StatisticsGraphHelper {
             Triple(dayOfWeek, startTime, endTime)
         }
     }
+
+    fun getHoursDay(): List<Triple<Long,Long,Long>> {
+        return historyData.map { historyItem ->
+            val spentTime = historyItem.spentTime
+            val startTime = historyItem.startTime
+            val endTime = historyItem.endTime
+            Triple(spentTime,startTime,endTime)
+        }
+    }
+
 
     private fun getDayOfWeek(date: Date): Int {
         val calendar = Calendar.getInstance()

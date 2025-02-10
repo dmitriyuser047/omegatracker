@@ -9,7 +9,7 @@ import com.example.omegatracker.service.TasksRunner
 import com.example.omegatracker.service.TasksService
 import com.example.omegatracker.ui.auth.AuthInstruction
 import com.example.omegatracker.ui.main.AddCustomTask
-import com.example.omegatracker.ui.statistics.StatisticsGraphHelper
+import com.example.omegatracker.ui.statistics.graph.StatisticsGraphHelper
 import dagger.Component
 import javax.inject.Singleton
 

@@ -305,9 +305,10 @@ class RepositoryImpl : Repository {
         taskDao.upsertHistoryTask(
             HistoryTask(
                 taskId = taskRun.id,
-                startTime = currentTime - 4 * 60 * 60 * 1000,//taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
-                endTime = currentTime,//(taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
-                date = currentTime
+                startTime = currentTime - 8 * 60 * 60 * 1000 ,//taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
+                endTime = currentTime - 6 * 60 * 60 * 1000,//(taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
+                date = currentTime,
+                spentTime =  2 * 60 * 60 * 1000
             )
         )
     }

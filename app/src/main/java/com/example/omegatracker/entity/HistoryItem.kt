@@ -9,4 +9,5 @@ interface HistoryItem {
     val startTime: Long
     val endTime: Long
     val date: Date
+    val spentTime: Long
 }
