@@ -9,6 +9,7 @@ import android.graphics.Shader
 import android.graphics.SweepGradient
 import android.util.TypedValue
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.ColorUtils
 import com.example.omegatracker.R
 import com.omega_r.libs.extensions.metrics.toDp
 
@@ -33,6 +34,17 @@ class Paints(private val context: Context) {
                 TypedValue.COMPLEX_UNIT_DIP,2f, context.resources.displayMetrics
             )
             pathEffect = DashPathEffect(floatArrayOf(25f, 20f), 0f)
+        }
+    }
+
+    fun createDashedCircleBackgroundLinePaint(): Paint {
+        return Paint().apply {
+            color = context.getColor(R.color.white)
+            style = Paint.Style.STROKE
+            strokeWidth = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,1f, context.resources.displayMetrics
+            )
+            pathEffect = DashPathEffect(floatArrayOf(15f, 25f), 0f)
         }
     }
 
@@ -92,23 +104,19 @@ class Paints(private val context: Context) {
         }
     }
 
-    fun createGradientBackgroundCircle(y: Float): Paint {
+    fun createGradientBackgroundCircle(y: Float, bottom: Float): Paint {
         return Paint().apply {
-            val sweepGradient = SweepGradient(
-                TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 20f, context.resources.displayMetrics
-                ),
-                y,
+            isAntiAlias = true
+            shader = LinearGradient(
+                0f, bottom,
+                0f, y,
                 intArrayOf(
-                    context.getColor(R.color.start_background_statistics_circle),
-                    context.getColor(R.color.center_background_statistics_circle),
-                    context.getColor(R.color.end_background_statistics_circle),
+                    ColorUtils.setAlphaComponent(context.getColor(R.color.backround_circular), 255),
+                    ColorUtils.setAlphaComponent(context.getColor(R.color.backround_circular), 63)
                 ),
-                floatArrayOf(
-                    0f, 0.7f, 1f
-                )
+                floatArrayOf(0f, 1f),
+                Shader.TileMode.CLAMP
             )
-            shader = sweepGradient
         }
     }
 

@@ -45,4 +45,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM historytask WHERE date BETWEEN :startDate AND :endDate")
     suspend fun getDataBetweenDates(startDate: Long, endDate: Long): List<HistoryData>
+
+    @Query("DELETE FROM historytask")
+    suspend fun clearHistoryItems()
 }

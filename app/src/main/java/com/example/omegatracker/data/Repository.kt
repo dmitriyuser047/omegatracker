@@ -31,6 +31,7 @@ interface Repository {
     suspend fun getAllHistoryTasks(): List<HistoryTask>
     fun getDayOfWeek(date: Date): String
     suspend fun getDataBetweenDate(time: Pair<Long, Long>): List<HistoryData>
+    suspend fun clearHistoryItems()
 
 //    suspend fun getImageUrlForTask(imageUrl: String?): String?
 }

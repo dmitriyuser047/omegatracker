@@ -38,6 +38,10 @@
     <string name="time_spent">Время затрачено</string>
     <string name="error_loading">Ошибка загрузки. Нажмите, чтобы повторить.\n</string>
     <string name="empty_list_history">У вас еще нет записей истории. \n</string>
+    <string name="confirm">Подтверждение</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="are_you_sure_you_want_to_cleanse">Вы уверены, что хотите очистить?</string>
 
     <string-array name="week_labels">
         <item>Пн</item>

@@ -1,5 +1,6 @@
 package com.example.omegatracker.ui.history
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -41,6 +42,8 @@ class HistoryFragment : BaseFragment(), HistoryFragmentView, HistoryFragmentList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         loadInitialData()
+        clickBackButton()
+        clickClearButton()
     }
 
     private fun setupRecyclerView() {
@@ -80,9 +83,8 @@ class HistoryFragment : BaseFragment(), HistoryFragmentView, HistoryFragmentList
     private fun loadInitialData() {
         lifecycleScope.launch {
             presenter.loadItems().collect { historyItems ->
-                //showProgressBar(true)
                 adapter.submitData(lifecycle, historyItems)
-                showProgressBar(false)
+                showProgressBar(true)
             }
         }
     }
@@ -94,6 +96,30 @@ class HistoryFragment : BaseFragment(), HistoryFragmentView, HistoryFragmentList
                 FragmentManager.POP_BACK_STACK_INCLUSIVE
             )
         }
+    }
+
+    private fun clickClearButton() {
+        binding.clearButton.setOnClickListener {
+            showClearConfirmationDialog()
+        }
+    }
+
+    private fun showClearConfirmationDialog() {
+        AlertDialog.Builder(context)
+            .setTitle(context?.getString(R.string.confirm))
+            .setMessage(context?.getString(R.string.are_you_sure_you_want_to_cleanse))
+            .setPositiveButton(context?.getString(R.string.yes)) { dialog, _ ->
+                presenter.clearData()
+                dialog.dismiss()
+            }
+            .setNegativeButton(context?.getString(R.string.no)) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    override fun refreshHistory() {
+        loadInitialData()
     }
 
     override fun navigateScreen(screens: Screens) {

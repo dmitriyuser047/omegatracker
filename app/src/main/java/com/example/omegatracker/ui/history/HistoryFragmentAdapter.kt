@@ -125,4 +125,5 @@ class HistoryFragmentAdapter(
             binding.date.text = toSimpleString(item.date)
         }
     }
+
 }

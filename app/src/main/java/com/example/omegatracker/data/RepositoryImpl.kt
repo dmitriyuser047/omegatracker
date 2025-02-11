@@ -305,10 +305,10 @@ class RepositoryImpl : Repository {
         taskDao.upsertHistoryTask(
             HistoryTask(
                 taskId = taskRun.id,
-                startTime = currentTime - 8 * 60 * 60 * 1000 ,//taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
-                endTime = currentTime - 6 * 60 * 60 * 1000,//(taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
+                startTime = taskRun.startTime.toLong(DurationUnit.MILLISECONDS),
+                endTime = (taskRun.startTime + taskRun.spentTime).toLong(DurationUnit.MILLISECONDS),
                 date = currentTime,
-                spentTime =  2 * 60 * 60 * 1000
+                spentTime = taskRun.spentTime.toLong(DurationUnit.MILLISECONDS)
             )
         )
     }
@@ -332,6 +332,10 @@ class RepositoryImpl : Repository {
 
     override suspend fun getDataBetweenDate(time: Pair<Long, Long>): List<HistoryData> {
         return taskDao.getDataBetweenDates(time.first, time.second)
+    }
+
+    override suspend fun clearHistoryItems() {
+        taskDao.clearHistoryItems()
     }
 
 }

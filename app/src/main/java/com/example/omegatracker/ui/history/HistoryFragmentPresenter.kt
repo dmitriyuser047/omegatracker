@@ -6,6 +6,7 @@ import com.example.omegatracker.entity.HistoryItem
 import com.example.omegatracker.ui.base.activity.BasePresenter
 import com.example.omegatracker.ui.history.HistoryFragmentAdapter.Companion.PAGE_SIZE
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -30,5 +31,12 @@ class HistoryFragmentPresenter @Inject constructor(private val repository: Repos
             set(Calendar.MILLISECOND, 0)
         }
         return calendar.timeInMillis
+    }
+
+    fun clearData() {
+        launch {
+            repository.clearHistoryItems()
+            viewState.refreshHistory()
+        }
     }
 }

@@ -2,9 +2,8 @@ package com.example.omegatracker.ui.statistics.graph
 
 import android.graphics.Canvas
 import android.graphics.Path
-import com.example.omegatracker.ui.statistics.graph.SettingsGraph.AXIS_LINE_OFFSET
 import com.example.omegatracker.ui.statistics.graph.SettingsGraph.PADDING_BOTTOM
-import com.example.omegatracker.ui.statistics.graph.SettingsGraph.PADDING_TOP
+import com.example.omegatracker.ui.statistics.graph.SettingsGraph.PADDING_RIGHT
 
 class WeekGraphRenderer(
     private val paints: Paints,
@@ -92,19 +91,24 @@ class WeekGraphRenderer(
         height: Float,
         countPoints: Int
     ) {
-        val lastX = graphWidth - SettingsGraph.PADDING_RIGHT
-        val lastY = (height - SettingsGraph.PADDING_BOTTOM) - (maxDurationsByDay[countPoints] ?: 0L) * yStep
+        val lastX = graphWidth - PADDING_RIGHT
+        val lastY = (height - PADDING_BOTTOM) - (maxDurationsByDay[countPoints] ?: 0L) * yStep
         path.lineTo(lastX, lastY)
     }
 
     private fun drawCircleAtMaxPoint(canvas: Canvas, x: Float, y: Float, height: Float, xStep: Float) {
-        val gradientPaint = paints.createGradientBackgroundCircle(y - PADDING_TOP - AXIS_LINE_OFFSET)
+        val gradientPaint = paints.createGradientBackgroundCircle(y, height - PADDING_BOTTOM)
         canvas.drawRect(
             x - xStep / 2,
-            y - PADDING_TOP - AXIS_LINE_OFFSET,
+            y,
             x + xStep / 2,
             height - PADDING_BOTTOM,
             gradientPaint
+        )
+        canvas.drawLine(
+            x, y ,
+            x,  height - PADDING_BOTTOM,
+            paints.createDashedCircleBackgroundLinePaint()
         )
         val radius = 20f
         val whiteRadius = radius * 0.6f

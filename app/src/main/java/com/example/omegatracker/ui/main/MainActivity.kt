@@ -21,7 +21,7 @@ import com.example.omegatracker.ui.history.HistoryFragment
 import com.example.omegatracker.ui.statistics.StatisticsFragment
 import com.example.omegatracker.ui.tasks.TasksFragment
 
-class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
+class MainActivity : BaseActivity(), MainView, AddCustomTaskListener {
 
     private lateinit var appComponent: AppComponent
     private lateinit var binding: ActivityMainBinding
@@ -39,10 +39,9 @@ class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
         appComponent = OmegaTrackerApplication.appComponent
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val intent = Intent(this, TasksService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
-        startService(intent)
+        startService()
         initialization()
+        addOnBackStackChangedListener()
     }
 
     override fun initialization() {
@@ -126,6 +125,27 @@ class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
         presenter.addNewTask(task)
     }
 
+    private fun startService() {
+        val intent = Intent(this, TasksService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_IMPORTANT)
+        startService(intent)
+    }
+
+    private fun addOnBackStackChangedListener() {
+        supportFragmentManager.addOnBackStackChangedListener {
+            updateStateBottomNavigation(getCurrentScreen())
+        }
+    }
+
+    private fun getCurrentScreen(): ScreensButtons {
+        return when (supportFragmentManager.findFragmentById(container)) {
+            is TasksFragment -> ScreensButtons.MAIN_SCREEN
+            is HistoryFragment -> ScreensButtons.HISTORY_SCREEN
+            is StatisticsFragment -> ScreensButtons.STATISTICS_SCREEN
+            else -> ScreensButtons.MAIN_SCREEN
+        }
+    }
+
     private fun updateStateBottomNavigation(state: ScreensButtons) {
         when (state) {
             ScreensButtons.HISTORY_SCREEN -> {
@@ -142,6 +162,5 @@ class MainActivity() : BaseActivity(), MainView, AddCustomTaskListener {
                 binding.statisticsButton.setImageResource(R.drawable.statistics_clicked)
             }
         }
-
     }
 }

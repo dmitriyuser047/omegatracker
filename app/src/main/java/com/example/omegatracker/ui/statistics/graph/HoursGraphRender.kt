@@ -2,9 +2,7 @@ package com.example.omegatracker.ui.statistics.graph
 
 import android.graphics.Canvas
 import android.graphics.Path
-import com.example.omegatracker.ui.statistics.graph.SettingsGraph.AXIS_LINE_OFFSET
 import com.example.omegatracker.ui.statistics.graph.SettingsGraph.PADDING_BOTTOM
-import com.example.omegatracker.ui.statistics.graph.SettingsGraph.PADDING_TOP
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 import kotlin.math.min
@@ -20,6 +18,22 @@ class HoursGraphRenderer(
     private var maxHoursY = Float.MAX_VALUE
     private val circlePaint = paints.createCirclePaint()
     private val innerCirclePaint = paints.createInnerCircle()
+
+    fun render(canvas: Canvas, graphWidth: Float, height: Float) {
+        if (timeData.isEmpty()) return
+
+        val xStep = SettingsGraph.calculateXStep(graphWidth, hours.size)
+        val availableHeight = SettingsGraph.calculateAvailableHeight(height)
+        val durationsByHour = calculateMaxDurationsByHours()
+        val maxDuration = durationsByHour.values.maxOrNull() ?: 1L
+        val yStep = SettingsGraph.calculateYStep(availableHeight, maxDuration)
+
+        path.reset()
+        drawHoursLinePoints(durationsByHour, xStep, height, yStep)
+        drawLastHoursPoint(graphWidth, durationsByHour, yStep, height)
+        canvas.drawPath(path, paints.createMainLinePaint(SettingsGraph.START_X_LINE, graphWidth))
+        drawCircleAtMaxPoint(canvas, maxHoursX, maxHoursY, height, xStep)
+    }
 
     private fun calculateMaxDurationsByHours(): Map<Double, Long> {
         val durationsByHour = mutableMapOf<Double, Long>()
@@ -46,22 +60,6 @@ class HoursGraphRenderer(
         var currentY = (height - PADDING_BOTTOM) - duration * yStep
         if (currentY < maxHeightY) currentY = maxHeightY
         return currentY
-    }
-
-    fun render(canvas: Canvas, graphWidth: Float, height: Float) {
-        if (timeData.isEmpty()) return
-
-        val xStep = SettingsGraph.calculateXStep(graphWidth, hours.size)
-        val availableHeight = SettingsGraph.calculateAvailableHeight(height)
-        val durationsByHour = calculateMaxDurationsByHours()
-        val maxDuration = durationsByHour.values.maxOrNull() ?: 1L
-        val yStep = SettingsGraph.calculateYStep(availableHeight, maxDuration)
-
-        path.reset()
-        drawHoursLinePoints(durationsByHour, xStep, height, yStep)
-        drawLastHoursPoint(graphWidth, durationsByHour, yStep, height)
-        canvas.drawPath(path, paints.createMainLinePaint(SettingsGraph.START_X_LINE, graphWidth))
-        drawCircleAtMaxPoint(canvas, maxHoursX, maxHoursY, height, xStep)
     }
 
     private fun drawHoursLinePoints(
@@ -117,13 +115,18 @@ class HoursGraphRenderer(
     }
 
     private fun drawCircleAtMaxPoint(canvas: Canvas, x: Float, y: Float, height: Float, xStep: Float) {
-        val gradientPaint = paints.createGradientBackgroundCircle(y - PADDING_TOP - AXIS_LINE_OFFSET)
+        val gradientPaint = paints.createGradientBackgroundCircle(y, height - PADDING_BOTTOM)
         canvas.drawRect(
             x - xStep / 2,
-            y - PADDING_TOP - AXIS_LINE_OFFSET,
+            y,
             x + xStep / 2,
             height - PADDING_BOTTOM,
             gradientPaint
+        )
+        canvas.drawLine(
+            x, y ,
+            x,  height - PADDING_BOTTOM,
+            paints.createDashedCircleBackgroundLinePaint()
         )
         val radius = 20f
         val whiteRadius = radius * 0.6f
